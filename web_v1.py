@@ -17,8 +17,8 @@ USE_DB = False
 def connect_database():
     return mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="Mp3mp41002@",
+        user="XXX",
+        password="XXX",
         database="healthy_system"
     )
 
