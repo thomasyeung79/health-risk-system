@@ -478,7 +478,7 @@ with col2:
         }[x]
     )
 
-if st.button("## 📊 Assessment Result"):
+if st.button("📊 Assessment Result"):
     result = run_web_assessment(
         weight_kg,
         height_cm,
