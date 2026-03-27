@@ -11,6 +11,8 @@ import streamlit as st
 import mysql.connector
 import pandas as pd
 
+st.set_page_config(page_title="AI Health Risk System", layout="wide")
+
 st.markdown("""
 <style>
 .main {
@@ -328,9 +330,6 @@ def run_web_assessment(
             "Habit": get_level("Habit"),
         }
     }
-
-
-st.set_page_config(page_title="AI Health Risk System", layout="wide")
 
 st.markdown("""
     <style>
