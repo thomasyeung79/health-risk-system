@@ -551,34 +551,25 @@ if st.button("Run Assessment"):
            color = "#dc3545"
            icon = "🔴"
 
-        st.markdown(f"""
-        <div style="
-            padding:12px;
-            border-radius:10px;
-            border:1px solid #e9ecef;
-            margin-bottom:10px;
-        ">
-            <div style="display:flex; justify-content:space-between;">
-                <span>{icon} {label}</span>
-                <span style="color:{color}; font-weight:600;">{status}</span>
-            </div>
-
+        st.markdown(
+            f"""
             <div style="
-                margin-top:8px;
-                height:6px;
-                background:#e9ecef;
-                border-radius:5px;
+                 padding:14px;
+                 border-radius:14px;
+                 margin-bottom:12px;
+                 background-color:#f9f9f9;
+                 border-left:6px solid {color};
+                 font-size:15px;
+                 font-weight:500;
             ">
-                <div style="
-                    width:{score}%;
-                    height:6px;
-                    background:{color};
-                    border-radius:5px;
-                "></div>
+                 <b>{icon}{label}</b>
+                 <b>{color} {name}</b> — <b>{level}</b>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-    
+            """,
+            unsafe_allow_html=True
+        )
+    for k in result["levels"]:
+        show_card(k, result["levels"][k])
     st.markdown("---")
 
     if result["red_flags"]:
