@@ -478,8 +478,6 @@ if st.button("Run Assessment"):
     if USE_DB:
         save_to_db(user_name, result)
 
-    st.success("Assessment completed.")
-
     c1, c2, c3 = st.columns(3)
 
     c1.markdown(f"""
@@ -542,32 +540,37 @@ if st.button("Run Assessment"):
 
     st.subheader("📊 Key Indicators")
 
-    def show_card(name, level):
-        if "High" in level:
-            color = "🔴"
-        elif "Medium" in level:
-            color = "🟡"
+    def indicator(label, status):
+        if status == "Healthy":
+           color = "#28a745"
+           icon = "🟢"
+        elif status == "Warning":
+           color = "#ffc107"
+           icon = "🟡"
         else:
-            color = "🟢"
+           color = "#dc3545"
+           icon = "🔴"
 
-        st.markdown(
-            f"""
-            <div style="
-                 padding:14px;
-                 border-radius:14px;
-                 margin-bottom:12px;
-                 background-color:#f9f9f9;
-                 border-left:6px solid {color};
-                 font-size:15px;
-                 font-weight:500;
-            ">
-                 <b>{color} {name}</b> — <b>{level}</b>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    for k in result["levels"]:
-        show_card(k, result["levels"][k])
+        st.markdown(f"""
+        <div style="
+            padding:12px;
+            border-radius:10px;
+            border:1px solid #e9ecef;
+            margin-bottom:10px;
+            display:flex;
+            justify-content:space-between;
+       ">
+            <span>{icon} {label}</span>
+            <span style="color:{color}; font-weight:600;">{status}</span>
+       </div>
+       """, unsafe_allow_html=True)
+
+    indicator("BMI", "Healthy")
+    indicator("Water", "Healthy")
+    indicator("Sleep", "Healthy")
+    indicator("Diet", "Medium")
+    indicator("Activity", "Healthy")
+    
     st.markdown("---")
 
     if result["red_flags"]:
