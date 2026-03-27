@@ -671,6 +671,5 @@ if st.button("📊 Assessment Result"):
         with col2:
             st.markdown("**Risk Index (%)**")
             st.line_chart(chart_df["risk_percent"], use_container_width=True)
-
-else:
-    st.info("No history records yet.")
+    else:
+        st.info("No history records yet.")
