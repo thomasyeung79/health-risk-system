@@ -567,8 +567,9 @@ if st.button("Run Assessment"):
             """,
             unsafe_allow_html=True
         )
+        
     for k in result["levels"]:
-        show_card(k, result["levels"][k])
+        indicator(k, result["levels"][k])
     st.markdown("---")
 
     if result["red_flags"]:
