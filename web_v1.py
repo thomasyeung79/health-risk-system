@@ -562,8 +562,7 @@ if st.button("Run Assessment"):
                  font-size:15px;
                  font-weight:500;
             ">
-                 <b>{icon}{label}</b>
-                 <b>{color} {name}</b> — <b>{level}</b>
+                 <b>{icon} {label}</b> — <b style="color:{color};">{status}</b>
             </div>
             """,
             unsafe_allow_html=True
