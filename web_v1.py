@@ -572,7 +572,7 @@ if st.button("Run Assessment"):
         )
         
     for k in result["levels"]:
-        indicator(k, result["levels"][k])
+        show_card(k, result["levels"][k])
     st.markdown("---")
 
     if result["red_flags"]:
