@@ -368,6 +368,7 @@ with col1:
     st.subheader("👤 Personal Information")
     weight_kg = st.number_input("Please enter your weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
     height_cm = st.number_input("Please enter your height (cm):", min_value=100.0, max_value=250.0, value=170.0)
+    st.markdown("---")
 
     st.subheader("💧 Hydration")
     water_ml = st.number_input("Please enter your actual water consumption (ml):", min_value=0.0, max_value=10000.0, value=2000.0)
@@ -381,10 +382,12 @@ with col1:
             "D": "D - Exercised or sweating in hot weather"
         }[x]
     )
+    st.markdown("---")
 
     st.subheader("😴 Sleep")
     sleep_hours = st.number_input("Please enter the average time of you sleeping for this week (hours):", min_value=0.0, max_value=24.0, value=7.0)
     night_wake_times = st.number_input("Please enter the average times of waking in night for this week (times):", min_value=0, max_value=20, value=1)
+    st.markdown("---")
 
     st.subheader("🏃 Activity")
     exercise_minutes = st.number_input("Please enter how long your exercise (minutes):", min_value=0.0, max_value=600.0, value=30.0)
@@ -412,6 +415,7 @@ with col2:
         "(Includes: soft drinks, bubble tea, energy drinks, sweetened juice):",
         min_value=0, max_value=10, value=1
     )
+    st.markdown("---")
 
     st.subheader("🧠 Mental Health")
     risk_score_emotion = st.selectbox(
@@ -444,9 +448,11 @@ with col2:
             3: "3 - Three issues"
         }[x]
     )
+    st.markdown("---")
 
     st.subheader("📱 Screen Time")
     screen_time_hours = st.number_input("Please enter your average daily screen time (hours):", min_value=0.0, max_value=24.0, value=4.0)
+    st.markdown("---")
 
     st.subheader("🚭 Habit")
     smoking = st.selectbox(
