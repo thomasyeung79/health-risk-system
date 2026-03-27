@@ -11,6 +11,30 @@ import streamlit as st
 import mysql.connector
 import pandas as pd
 
+st.markdown("""
+<style>
+.main {
+    background-color: #f7f9fc;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+div[data-testid="stMetric"] {
+    background-color: white;
+    border: 1px solid #e9ecef;
+    padding: 12px;
+    border-radius: 14px;
+}
+
+h1, h2, h3 {
+    color: #212529;
+}
+</style>
+""", unsafe_allow_html=True)
+
 USE_DB = True
 
 def connect_database():
@@ -330,6 +354,7 @@ st.markdown("""
 st.title("🧠 AI Health Risk System")
 st.caption("Understand your health in 60 seconds")
 st.markdown("---")
+st.info("Enter your lifestyle data to get a quick health risk assessment and personalised insights.")
 
 user_name = st.text_input("👤 Enter your user name:")
 
@@ -340,7 +365,7 @@ if not user_name:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("### 👈 Basic Health Info")
+    st.markdown("### 🩺 Basic Health Information")
     st.subheader("👤 Personal Information")
     weight_kg = st.number_input("Please enter your weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
     height_cm = st.number_input("Please enter your height (cm):", min_value=100.0, max_value=250.0, value=170.0)
@@ -369,7 +394,7 @@ with col1:
 st.markdown("---")
 
 with col2:
-    st.markdown("### 👉 Lifestyle & Mental")
+    st.markdown("### 🌿 Lifestyle & Mental Health")
     st.subheader("🥗 Diet")
     fruit_veg_servings = st.number_input(
         "Please enter your fruit and vegetable servings per day (servings per day)"
@@ -453,7 +478,7 @@ with col2:
         }[x]
     )
 
-if st.button("Run Assessment"):
+if st.button("## 📊 Assessment Result"):
     result = run_web_assessment(
         weight_kg,
         height_cm,
@@ -539,7 +564,7 @@ if st.button("Run Assessment"):
     st.markdown("---")
 
     st.subheader("📊 Key Indicators")
-
+    st.caption("These indicators summarise the condition of each health dimension.")
     def show_card(name, level):
         if "High" in level:
             status = "Dangerous"
@@ -594,7 +619,7 @@ if st.button("Run Assessment"):
         st.markdown("---")
 
     st.subheader("📜 History")
-
+    st.caption("Recent assessment records and trend changes over time.")
     if USE_DB:
         history = get_history(user_name)
 
@@ -627,7 +652,7 @@ if st.button("Run Assessment"):
     st.markdown("---")
 
     st.markdown("### 📈 Trends")
-
+    st.caption("This chart shows how your health score and risk percentage have changed across recent records.")
     chart_df = df.sort_values("created_at").set_index("created_at")
 
     col1, col2 = st.columns(2)
