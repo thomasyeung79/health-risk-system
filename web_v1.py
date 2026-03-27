@@ -75,7 +75,8 @@ def get_history(user_name):
     cursor = conn.cursor(dictionary=True)
 
     query = """
-    SELECT * FROM health_records
+    SELECT created_at, health_score, risk_level, risk_percent
+    FROM healthy_records_web
     WHERE user_name = %s
     ORDER BY created_at DESC
     LIMIT 20
@@ -604,7 +605,7 @@ if st.button("Run Assessment"):
 
         st.caption(f"Total records: {len(df)}")
 
-        st.markdown("---")
+    st.markdown("---")
 
         st.markdown("### 📈 Trends")
 
