@@ -598,7 +598,7 @@ if st.button("Run Assessment"):
                       "risk_percent"
                      ]
 
-        show_df = show_df[[col for col in show_cols if col in show_df.columns]]
+    show_df = show_df[[col for col in show_cols if col in show_df.columns]]
 
     st.markdown("### 📋 Recent Records")
     st.dataframe(show_df, use_container_width=True, height=200)
@@ -623,5 +623,5 @@ if st.button("Run Assessment"):
             st.markdown("**Risk Index (%)**")
             st.line_chart(chart_df["risk_percent"], use_container_width=True)
 
-    else:
-        st.info("No history records yet.")
+else:
+    st.info("No history records yet.")
