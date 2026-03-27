@@ -540,7 +540,7 @@ if st.button("Run Assessment"):
 
     st.subheader("📊 Key Indicators")
 
-        def show_card(name, level):
+    def show_card(name, level):
         if "High" in level:
             status = "Dangerous"
             color = "#dc3545"
