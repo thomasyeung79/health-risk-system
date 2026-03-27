@@ -1,5 +1,3 @@
-import streamlit as st
-
 from bmi import calc_bmi
 from water_ratio import calc_water_ratio
 from sleep import calc_sleep
@@ -9,19 +7,19 @@ from mental_healthy import calc_mental_healthy
 from screen_time import calc_screen_time
 from habit import calc_habit
 
+import streamlit as st
 import mysql.connector
-import pandas as pd
 
-USE_DB = False
+USE_DB = True
 
 def connect_database():
     return mysql.connector.connect(
-        host="localhost",
-        user="XXX",
-        password="XXX",
-        database="healthy_system"
+        host=st.secrets["MYSQLHOST"],
+        user=st.secrets["MYSQLUSER"],
+        password=st.secrets["MYSQLPASSWORD"],
+        database=st.secrets["MYSQLDATABASE"],
+        port=int(st.secrets["MYSQLPORT"])
     )
-
 
 def save_to_db(user_name, result):
     db = connect_database()
@@ -307,25 +305,48 @@ def run_web_assessment(
 
 
 st.set_page_config(page_title="AI Health Risk System", layout="wide")
-st.title("AI Health Risk System")
 
-user_name = st.text_input("Enter your name")
+st.markdown("""
+    <style>
+    .main {
+        padding-top: 1.5rem;
+    }
+
+    div[data-testid="stMetric"] {
+        background-color: #f8fafc;
+        border: 1px solid #e5e7eb;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    div.stAlert {
+        border-radius: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🧠 AI Health Risk System")
+st.caption("Understand your health in 60 seconds")
+st.markdown("---")
+
+user_name = st.text_input("👤 Enter your user name:")
 
 if not user_name:
-    st.info("Please enter your name first.")
+    st.info("👆 Please enter your name to start the assessment.")
     st.stop()
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("## Personal Information")
-    weight_kg = st.number_input("Weight (kg)", min_value=30.0, max_value=300.0, value=70.0)
-    height_cm = st.number_input("Height (cm)", min_value=100.0, max_value=250.0, value=170.0)
+    st.markdown("### 👈 Basic Health Info")
+    st.subheader("👤 Personal Information")
+    weight_kg = st.number_input("Please enter your weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
+    height_cm = st.number_input("Please enter your height (cm):", min_value=100.0, max_value=250.0, value=170.0)
 
-    st.markdown("## Hydration")
-    water_ml = st.number_input("Actual water consumption (ml)", min_value=0.0, max_value=10000.0, value=2000.0)
+    st.subheader("💧 Hydration")
+    water_ml = st.number_input("Please enter your actual water consumption (ml):", min_value=0.0, max_value=10000.0, value=2000.0)
     situation = st.selectbox(
-        "Situation",
+        "Please choose your situation today:",
         ["A", "B", "C", "D"],
         format_func=lambda x: {
             "A": "A - Normal",
@@ -335,23 +356,40 @@ with col1:
         }[x]
     )
 
-    st.markdown("## Sleep")
-    sleep_hours = st.number_input("Average sleep hours this week", min_value=0.0, max_value=24.0, value=7.0)
-    night_wake_times = st.number_input("Average waking times at night", min_value=0, max_value=20, value=1)
+    st.subheader("😴 Sleep")
+    sleep_hours = st.number_input("Please enter the average time of you sleeping for this week (hours):", min_value=0.0, max_value=24.0, value=7.0)
+    night_wake_times = st.number_input("Please enter the average times of waking in night for this week (times):", min_value=0, max_value=20, value=1)
 
-    st.markdown("## Activity")
-    exercise_minutes = st.number_input("Exercise minutes", min_value=0.0, max_value=600.0, value=30.0)
-    sedentary_hours = st.number_input("Sedentary hours", min_value=0.0, max_value=24.0, value=6.0)
+    st.subheader("🏃 Activity")
+    exercise_minutes = st.number_input("Please enter how long your exercise (minutes):", min_value=0.0, max_value=600.0, value=30.0)
+    sedentary_hours = st.number_input("Please enter how long your sedentary (hours):", min_value=0.0, max_value=24.0, value=6.0)
+
+st.markdown("---")
 
 with col2:
-    st.markdown("## Diet")
-    fruit_veg_servings = st.number_input("Fruit and vegetable servings per day", min_value=0.0, max_value=20.0, value=3.0)
-    fast_food_times = st.number_input("Fast food times per week", min_value=0, max_value=21, value=1)
-    sugary_drinks = st.number_input("Sugary drinks per day", min_value=0, max_value=10, value=1)
+    st.markdown("### 👉 Lifestyle & Mental")
+    st.subheader("🥗 Diet")
+    fruit_veg_servings = st.number_input(
+        "Please enter your fruit and vegetable servings per day (servings per day)"
+        "(1 serving ≈ 1 medium fruit or 1/2 cup vegetables):",
+        min_value=0.0, max_value=20.0, value=3.0
+    )
 
-    st.markdown("## Mental Health")
+    fast_food_times = st.number_input(
+        "Please enter the average times of fast food per week (times per week)"
+        "(Includes: McDonald's, KFC, fried food, pizza, takeaway meals):",
+        min_value=0, max_value=21, value=1
+    )
+
+    sugary_drinks = st.number_input(
+        "Please enter your sugary drinks per day (per day)"
+        "(Includes: soft drinks, bubble tea, energy drinks, sweetened juice):",
+        min_value=0, max_value=10, value=1
+    )
+
+    st.subheader("🧠 Mental Health")
     risk_score_emotion = st.selectbox(
-        "Emotion issues: Easily get irritated / Easily experience anxiety / Have significant mood swings",
+        "In the past week, have you experienced any of the following situations? (Easily get irritated, Easily experience anxiety, and Have significant mood swings). Please choose the quantity you have(0-3):",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -361,7 +399,7 @@ with col2:
         }[x]
     )
     risk_score_focus = st.selectbox(
-        "Focus issues: Distraction / Not wanting to do things / Decrease in efficiency",
+        "In the past week, have you experienced any of the following situations? (Distraction, Not wanting to do things, and Decrease in efficiency). Please choose the quantity you have(0-3):",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -371,7 +409,7 @@ with col2:
         }[x]
     )
     risk_score_body = st.selectbox(
-        "Body issues: Easily fatigued or Lacking energy / Headache or Tense muscles / Rapid heartbeat or Chest tightness or Sense of tension",
+        "In the past week, have you experienced any of the following physical reactions? (Easily fatigued, Headache, and Sense of tension). Please choose the quantity you have(0-3):",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -381,12 +419,12 @@ with col2:
         }[x]
     )
 
-    st.markdown("## Screen Time")
-    screen_time_hours = st.number_input("Screen time", min_value=0.0, max_value=24.0, value=4.0)
+    st.subheader("📱 Screen Time")
+    screen_time_hours = st.number_input("Please enter your average daily screen time (hours):", min_value=0.0, max_value=24.0, value=4.0)
 
-    st.markdown("## Habit")
+    st.subheader("🚭 Habit")
     smoking = st.selectbox(
-        "Smoking",
+        "Please choose your smoking frequency everyday:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
@@ -395,7 +433,7 @@ with col2:
         }[x]
     )
     alcohol = st.selectbox(
-        "Alcohol",
+        "Please choose your alcohol consumption everyday:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
@@ -404,7 +442,7 @@ with col2:
         }[x]
     )
     late_night = st.selectbox(
-        "Late night",
+        "Please choose your late-night habit everyday:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
@@ -441,43 +479,100 @@ if st.button("Run Assessment"):
     st.success("Assessment completed.")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Health Score", result["health_score"])
-    c2.metric("Risk Level", result["risk_level"])
-    c3.metric("Risk Index", f'{result["risk_percent"]}%')
 
-    if result["risk_level"] == "Low risk":
-        st.success("Overall status: Low risk")
+    c1.markdown(f"""
+    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
+        <div style="font-size:14px; color:#666;">Health Score</div>
+        <div style="font-size:28px; font-weight:bold;">{result["health_score"]:.1f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if result["risk_level"] == "High risk":
+        color = "#ff4b4b"
+        text = "🔴 HIGH"
     elif result["risk_level"] == "Medium risk":
-        st.warning("Overall status: Medium risk")
+        color = "#ffa500"
+        text = "🟡 MEDIUM"
     else:
-        st.error("Overall status: High risk")
+        color = "#00c853"
+        text = "🟢 LOW"
 
-    st.subheader("Summary")
-    st.write(result["summary"])
+    c2.markdown(f"""
+    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
+        <div style="font-size:14px; color:#666;">Risk Level</div>
+        <div style="font-size:22px; font-weight:bold; color:{color};">{text}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.subheader("Key Indicators")
-    for k, v in result["metrics"].items():
-        st.write(f"{k}: {v} ({result['levels'][k]})")
+    c3.markdown(f"""
+    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
+        <div style="font-size:14px; color:#666;">Risk Index</div>
+        <div style="font-size:28px; font-weight:bold;">{result["risk_percent"]:.1f}%</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    if result["red_flags"]:
-        st.subheader("High-Priority Concerns")
-        for item in result["red_flags"][:3]:
-            st.write(f"- {item}")
-
-    st.subheader("Main Concerns")
-    if result["main_concerns"]:
-        for item in result["main_concerns"][:2]:
-            st.write(f"- {item}")
+    if result["risk_level"] == "High risk":
+        st.error("High health risk detected. Immediate attention is recommended.")
+    elif result["risk_level"] == "Medium risk":
+        st.warning("Moderate risk. Some improvements are needed.")
     else:
-        st.write("- No major health concerns identified.")
-
-    if result["lifestyle"]:
-        st.subheader("Healthy Lifestyle Tips")
-        for item in result["lifestyle"][:2]:
-            st.write(f"- {item}")
+        st.success("Low risk. Keep maintaining your lifestyle.")
 
     st.markdown("---")
-    st.subheader("History")
+
+    st.subheader("📝 Summary")
+    st.info(result["summary"])
+    st.markdown("---")
+
+    st.subheader("📊 Key Indicators")
+
+    def show_card(name, level):
+        if "High" in level:
+            color = "🔴"
+        elif "Medium" in level:
+            color = "🟡"
+        else:
+            color = "🟢"
+
+        st.markdown(
+            f"""
+            <div style="
+                 padding:14px;
+                 border-radius:14px;
+                 margin-bottom:12px;
+                 background-color:#f9f9f9;
+                 border-left:6px solid {color};
+                 font-size:15px;
+                 font-weight:500;
+            ">
+                 <b>{color} {name}</b> — <b>{level}</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    for k in result["levels"]:
+        show_card(k, result["levels"][k])
+    st.markdown("---")
+
+    if result["red_flags"]:
+        st.subheader("🚨 High-Priority Concerns")
+        for item in result["red_flags"][:3]:
+            st.error(f"⚠️ {item}")
+        st.markdown("---")
+
+    if result["main_concerns"]:
+        st.subheader("⚠️ Main Concerns")
+        for item in result["main_concerns"][:3]:
+            st.warning(item)
+        st.markdown("---")
+
+    if result["lifestyle"]:
+        st.subheader("💡 Healthy Tips")
+        for item in result["lifestyle"][:3]:
+            st.info(item)
+        st.markdown("---")
+
+    st.subheader("📜 History")
 
     if USE_DB:
         history = get_history(user_name)
@@ -492,42 +587,39 @@ if st.button("Run Assessment"):
             show_df["created_at"] = show_df["created_at"].dt.strftime("%Y-%m-%d %H:%M")
 
             show_cols = [
-                "created_at",
-                "health_score",
-                "risk_level",
-                "risk_percent",
-                "bmi",
-                "mental_score",
-                "screen_metric"
+                 "created_at",
+                 "health_score",
+                 "risk_level",
+                 "risk_percent"
             ]
 
             show_df = show_df[[col for col in show_cols if col in show_df.columns]]
 
-            st.dataframe(show_df, use_container_width=True)
-            st.write(f"Total records: {len(df)}")
+            st.markdown("### 🧾 Recent Records")
+            st.dataframe(show_df, use_container_width=True, height=200)
+
+            st.caption(f"Total records: {len(df)}")
+
+            st.markdown("---")
+
+            st.markdown("### 📈 Trends")
 
             chart_df = df.sort_values("created_at").set_index("created_at")
 
+            col1, col2 = st.columns(2)
+
             if "health_score" in chart_df.columns:
-                st.subheader("Health Score Trend")
-                st.line_chart(chart_df[["health_score"]], use_container_width=True)
+                with col1:
+                    st.markdown("**Health Score**")
+                    st.line_chart(chart_df["health_score"], use_container_width=True)
 
             if "risk_percent" in chart_df.columns:
-                st.subheader("Risk Percent Trend")
-                st.line_chart(chart_df[["risk_percent"]], use_container_width=True)
+                with col2:
+                    st.markdown("**Risk Index (%)**")
+                    st.line_chart(chart_df["risk_percent"], use_container_width=True)
 
-            if "bmi" in chart_df.columns:
-                st.subheader("BMI Trend")
-                st.line_chart(chart_df[["bmi"]], use_container_width=True)
+            else:
+                st.info("No history records yet.")
 
-            if "mental_score" in chart_df.columns:
-                st.subheader("Mental Score Trend")
-                st.line_chart(chart_df[["mental_score"]], use_container_width=True)
-
-            if "screen_metric" in chart_df.columns:
-                st.subheader("Screen Time Trend")
-                st.line_chart(chart_df[["screen_metric"]], use_container_width=True)
         else:
             st.info("No history records yet.")
-    else:
-        st.info("History disabled in online version.")
