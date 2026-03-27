@@ -9,6 +9,7 @@ from habit import calc_habit
 
 import streamlit as st
 import mysql.connector
+import pandas as pd
 
 USE_DB = True
 
@@ -70,23 +71,23 @@ def save_to_db(user_name, result):
     db.close()
 
 def get_history(user_name):
-    db = connect_database()
-    cursor = db.cursor(dictionary=True)
+    conn = connect_database()
+    cursor = conn.cursor(dictionary=True)
 
-    cursor.execute(
-        """
-        SELECT id, user_name, health_score, risk_level, risk_percent, bmi, mental_score, screen_metric, created_at
-        FROM healthy_records_web
-        WHERE user_name = %s
-        ORDER BY id DESC
-        """,
-        (user_name,)
-    )
+    query = """
+    SELECT * FROM health_records
+    WHERE user_name = %s
+    ORDER BY created_at DESC
+    LIMIT 20
+    """
+    
+    cursor.execute(query, (user_name,))
+    results = cursor.fetchall()
 
-    rows = cursor.fetchall()
     cursor.close()
-    db.close()
-    return rows
+    conn.close()
+
+    return results
 
 def run_web_assessment(
     weight_kg,
@@ -575,30 +576,33 @@ if st.button("Run Assessment"):
     st.subheader("📜 History")
 
     if USE_DB:
-        history = get_history(user_name)
+    history = get_history(user_name)
 
-        if history:
-            df = pd.DataFrame(history)
+    if history:
+        df = pd.DataFrame(history)
 
+        if "created_at" in df.columns:
             df["created_at"] = pd.to_datetime(df["created_at"])
             df = df.sort_values("created_at", ascending=False)
 
             show_df = df.copy()
             show_df["created_at"] = show_df["created_at"].dt.strftime("%Y-%m-%d %H:%M")
+        else:
+            show_df = df.copy()
 
-            show_cols = [
-                 "created_at",
-                 "health_score",
-                 "risk_level",
-                 "risk_percent"
-            ]
+        show_cols = [
+            "created_at",
+            "health_score",
+            "risk_level",
+            "risk_percent"
+        ]
 
-            show_df = show_df[[col for col in show_cols if col in show_df.columns]]
+        show_df = show_df[[col for col in show_cols if col in show_df.columns]]
 
-            st.markdown("### 🧾 Recent Records")
-            st.dataframe(show_df, use_container_width=True, height=200)
+        st.markdown("### 📋 Recent Records")
+        st.dataframe(show_df, use_container_width=True, height=200)
 
-            st.caption(f"Total records: {len(df)}")
+        st.caption(f"Total records: {len(df)}")
 
             st.markdown("---")
 
