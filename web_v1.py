@@ -540,16 +540,19 @@ if st.button("Run Assessment"):
 
     st.subheader("📊 Key Indicators")
 
-    def indicator(label, status):
-        if status == "Healthy":
-           color = "#28a745"
-           icon = "🟢"
-        elif status == "Warning":
-           color = "#ffc107"
-           icon = "🟡"
+        def show_card(name, level):
+        if "High" in level:
+            status = "Dangerous"
+            color = "#dc3545"
+            icon = "🔴"
+        elif "Medium" in level:
+            status = "Warning"
+            color = "#ffc107"
+            icon = "🟡"
         else:
-           color = "#dc3545"
-           icon = "🔴"
+            status = "Healthy"
+            color = "#28a745"
+            icon = "🟢"
 
         st.markdown(
             f"""
@@ -562,7 +565,7 @@ if st.button("Run Assessment"):
                  font-size:15px;
                  font-weight:500;
             ">
-                 <b>{icon} {label}</b> — <b style="color:{color};">{status}</b>
+                 <b>{icon} {name}</b> — <span style="color:{color}; font-weight:700;">{status}</span>
             </div>
             """,
             unsafe_allow_html=True
