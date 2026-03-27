@@ -564,12 +564,6 @@ if st.button("Run Assessment"):
             <span style="color:{color}; font-weight:600;">{status}</span>
        </div>
        """, unsafe_allow_html=True)
-
-    indicator("BMI", "Healthy")
-    indicator("Water", "Healthy")
-    indicator("Sleep", "Healthy")
-    indicator("Diet", "Medium")
-    indicator("Activity", "Healthy")
     
     st.markdown("---")
 
