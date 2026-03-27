@@ -557,13 +557,27 @@ if st.button("Run Assessment"):
             border-radius:10px;
             border:1px solid #e9ecef;
             margin-bottom:10px;
-            display:flex;
-            justify-content:space-between;
-       ">
-            <span>{icon} {label}</span>
-            <span style="color:{color}; font-weight:600;">{status}</span>
-       </div>
-       """, unsafe_allow_html=True)
+        ">
+            <div style="display:flex; justify-content:space-between;">
+                <span>{icon} {label}</span>
+                <span style="color:{color}; font-weight:600;">{status}</span>
+            </div>
+
+            <div style="
+                margin-top:8px;
+                height:6px;
+                background:#e9ecef;
+                border-radius:5px;
+            ">
+                <div style="
+                    width:{score}%;
+                    height:6px;
+                    background:{color};
+                    border-radius:5px;
+                "></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
 
