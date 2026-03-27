@@ -483,33 +483,33 @@ if st.button("Run Assessment"):
     c1, c2, c3 = st.columns(3)
 
     c1.markdown(f"""
-    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
-        <div style="font-size:14px; color:#666;">Health Score</div>
-        <div style="font-size:28px; font-weight:bold;">{result["health_score"]:.1f}</div>
-    </div>
+    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+       <div style="font-size:13px; color:#6c757d;">Health Score</div>
+       <div style="font-size:34px; font-weight:700; color:#212529;">{result["health_score"]:.1f}</div>
+       </div>
     """, unsafe_allow_html=True)
 
     if result["risk_level"] == "High risk":
-        color = "#ff4b4b"
-        text = "🔴 HIGH"
+       color = "#dc3545"
+       text = "🔴 High Risk"
     elif result["risk_level"] == "Medium risk":
-        color = "#ffa500"
-        text = "🟡 MEDIUM"
+       color = "#f0ad4e"
+       text = "🟡 Medium Risk"
     else:
-        color = "#00c853"
-        text = "🟢 LOW"
+       color = "#28a745"
+       text = "🟢 Low Risk"
 
     c2.markdown(f"""
-    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
-        <div style="font-size:14px; color:#666;">Risk Level</div>
-        <div style="font-size:22px; font-weight:bold; color:{color};">{text}</div>
+    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+       <div style="font-size:13px; color:#6c757d;">Risk Level</div>
+       <div style="font-size:24px; font-weight:700; color:{color};">{text}</div>
     </div>
     """, unsafe_allow_html=True)
 
     c3.markdown(f"""
-    <div style="padding:15px; border-radius:12px; background:#f5f5f5;">
-        <div style="font-size:14px; color:#666;">Risk Index</div>
-        <div style="font-size:28px; font-weight:bold;">{result["risk_percent"]:.1f}%</div>
+    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+       <div style="font-size:13px; color:#6c757d;">Risk Percent</div>
+       <div style="font-size:34px; font-weight:700; color:#212529;">{result["risk_percent"]:.1f}%</div>
     </div>
     """, unsafe_allow_html=True)
 
