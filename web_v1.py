@@ -604,26 +604,23 @@ if st.button("Run Assessment"):
 
         st.caption(f"Total records: {len(df)}")
 
-            st.markdown("---")
+        st.markdown("---")
 
-            st.markdown("### 📈 Trends")
+        st.markdown("### 📈 Trends")
 
-            chart_df = df.sort_values("created_at").set_index("created_at")
+        chart_df = df.sort_values("created_at").set_index("created_at")
 
-            col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-            if "health_score" in chart_df.columns:
-                with col1:
-                    st.markdown("**Health Score**")
-                    st.line_chart(chart_df["health_score"], use_container_width=True)
+        if "health_score" in chart_df.columns:
+            with col1:
+                st.markdown("**Health Score**")
+                st.line_chart(chart_df["health_score"], use_container_width=True)
 
-            if "risk_percent" in chart_df.columns:
-                with col2:
-                    st.markdown("**Risk Index (%)**")
-                    st.line_chart(chart_df["risk_percent"], use_container_width=True)
-
-            else:
-                st.info("No history records yet.")
+        if "risk_percent" in chart_df.columns:
+            with col2:
+                st.markdown("**Risk Index (%)**")
+                st.line_chart(chart_df["risk_percent"], use_container_width=True)
 
         else:
             st.info("No history records yet.")
