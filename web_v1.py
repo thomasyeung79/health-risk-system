@@ -526,8 +526,6 @@ if st.button("Run Assessment"):
        <div style="font-size:34px; font-weight:700; color:#212529;">{result["risk_percent"]:.1f}%</div>
     </div>
     """, unsafe_allow_html=True)
-
-    st.markdowm("---")
     
     if result["risk_level"] == "High risk":
        st.error("High health risk detected. Please review your lifestyle habits and take action soon.")
