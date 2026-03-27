@@ -580,25 +580,25 @@ if st.button("Run Assessment"):
         history = get_history(user_name)
 
         if history:
-            df = pd.DataFrame(history)
+           df = pd.DataFrame(history)
 
            if "created_at" in df.columns:
-    df["created_at"] = pd.to_datetime(df["created_at"])
-    df = df.sort_values("created_at", ascending=False)
+               df["created_at"] = pd.to_datetime(df["created_at"])
+               df = df.sort_values("created_at", ascending=False)
 
-    show_df = df.copy()
-    show_df["created_at"] = show_df["created_at"].dt.strftime("%Y-%m-%d %H:%M")
-else:
-    show_df = df.copy()
+               show_df = df.copy()
+               show_df["created_at"] = show_df["created_at"].dt.strftime("%Y-%m-%d %H:%M")
+           else:
+               show_df = df.copy()
 
-show_cols = [
-    "created_at",
-    "health_score",
-    "risk_level",
-    "risk_percent"
-]
+           show_cols = [
+               "created_at",
+               "health_score",
+               "risk_level",
+               "risk_percent"
+            ]
 
-show_df = show_df[[col for col in show_cols if col in show_df.columns]]
+           show_df = show_df[[col for col in show_cols if col in show_df.columns]]
 
     st.markdown("### 📋 Recent Records")
     st.dataframe(show_df, use_container_width=True, height=200)
