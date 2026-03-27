@@ -483,7 +483,12 @@ if st.button("Run Assessment"):
     c1, c2, c3 = st.columns(3)
 
     c1.markdown(f"""
-    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+    <div style="
+       padding:18px; 
+       border-radius:14px; 
+       background:#ffffff; 
+       border:1px solid #e9ecef;
+       box-shadow:0 1px 4px rgba(0,0,0,0.04);">
        <div style="font-size:13px; color:#6c757d;">Health Score</div>
        <div style="font-size:34px; font-weight:700; color:#212529;">{result["health_score"]:.1f}</div>
        </div>
@@ -500,25 +505,36 @@ if st.button("Run Assessment"):
        text = "🟢 Low Risk"
 
     c2.markdown(f"""
-    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+    <div style="
+       padding:18px; 
+       border-radius:14px; 
+       background:#ffffff; 
+       border:1px solid #e9ecef;
+       box-shadow:0 1px 4px rgba(0,0,0,0.04);">
        <div style="font-size:13px; color:#6c757d;">Risk Level</div>
        <div style="font-size:24px; font-weight:700; color:{color};">{text}</div>
     </div>
     """, unsafe_allow_html=True)
 
     c3.markdown(f"""
-    <div style="padding:18px; border-radius:14px; background:#ffffff; border:1px solid #e9ecef;">
+    <div style="
+       padding:18px; 
+       border-radius:14px; 
+       background:#ffffff; border:1px solid #e9ecef;
+       box-shadow:0 1px 4px rgba(0,0,0,0.04);">
        <div style="font-size:13px; color:#6c757d;">Risk Percent</div>
        <div style="font-size:34px; font-weight:700; color:#212529;">{result["risk_percent"]:.1f}%</div>
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdowm("---")
+    
     if result["risk_level"] == "High risk":
-        st.error("High health risk detected. Immediate attention is recommended.")
+       st.error("High health risk detected. Please review your lifestyle habits and take action soon.")
     elif result["risk_level"] == "Medium risk":
-        st.warning("Moderate risk. Some improvements are needed.")
+       st.warning("Medium health risk detected. Some areas of your lifestyle may need improvement.")
     else:
-        st.success("Low risk. Keep maintaining your lifestyle.")
+       st.success("You are currently at low health risk. Keep maintaining your healthy habits.")
 
     st.markdown("---")
 
