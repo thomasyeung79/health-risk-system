@@ -694,9 +694,9 @@ if st.button("🚀 Generate AI Health Report"):
     """, unsafe_allow_html=True)
     
     if result["risk_level"] == "High risk":
-       st.error("High health risk detected. Please review your lifestyle habits and take action soon.")
+       st.errorst.error("You are currently at high health risk. Please review your lifestyle habits and take action soon.")
     elif result["risk_level"] == "Medium risk":
-       st.warning("Medium health risk detected. Some areas of your lifestyle may need improvement.")
+       st.warning("You are currently at medium health risk. Some lifestyle improvements are recommended.")
     else:
        st.success("You are currently at low health risk. Keep maintaining your healthy habits.")
 
