@@ -424,11 +424,16 @@ with col1:
         border:1px solid #e9ecef;
         margin-bottom:20px;
     ">
-    """, unsafe_allow_html=True)
 
-    st.subheader("🩺 Basic Health Information")
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("---")
+    <div style="
+        font-size:20px;
+        font-weight:700;
+        margin-bottom:12px;
+    ">
+    🩺 Basic Health Information
+    </div>
+    
+    """, unsafe_allow_html=True)
     
     st.subheader("🧍 Personal Information")
     st.caption("Enter your basic body information.")
