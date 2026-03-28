@@ -507,7 +507,7 @@ with col2:
         color:#6c757d;
         margin-bottom:12px;
     ">
-    Enter your lifestyle and mental Health
+    Enter your lifestyle and mental health
     </div>
 
     <hr style="margin:10px 0; border:none; border-top:1px solid #eee;">
