@@ -740,29 +740,26 @@ if st.button("🚀 Generate AI Health Report"):
         show_card(k, result["levels"][k])
     st.markdown("---")
 
-    st.subheader("📝 Summary")
+    st.subheader("📝 Healthy Report")
     if result["risk_level"] == "High risk":
         st.error(f"Overall assessment: {result['overall']}")
     elif result["risk_level"] == "Medium risk":
         st.warning(f"Overall assessment: {result['overall']}")
     else:
         st.success(f"Overall assessment: {result['overall']}")
-    st.markdown("---")
     
     if result["red_flags"]:
         st.subheader("🚨 High-Priority Concerns")
         for item in result["red_flags"][:3]:
             st.error(f"⚠️ {item}")
-        st.markdown("---")
 
     if result["main_concerns"]:
-        st.subheader("⚠️ Main Concerns")
+        st.subheader("⚠️ Areas for Improvement")
         for item in result["main_concerns"][:3]:
             st.warning(item)
-        st.markdown("---")
 
     if result["lifestyle"]:
-        st.subheader("💡 Healthy Tips")
+        st.subheader("💡 Recommendations")
         for item in result["lifestyle"][:3]:
             st.info(item)
         st.markdown("---")
