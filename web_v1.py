@@ -740,6 +740,56 @@ if st.button("🚀 Generate AI Health Report"):
         show_card(k, result["levels"][k])
     st.markdown("---")
 
+    st.markdown("### 📏 Risk Progress")
+    st.progress(result["risk_percent"] / 100)
+
+    if result["risk_level"] == "High risk":
+        st.error(f"Current risk percentage: {result['risk_percent']:.1f}%")
+    elif result["risk_level"] == "Medium risk":
+        st.warning(f"Current risk percentage: {result['risk_percent']:.1f}%")
+    else:
+        st.success(f"Current risk percentage: {result['risk_percent']:.1f}%")
+        st.markdown("---")
+      
+    st.markdown("### 🕸️ Health Radar")
+    st.caption("This chart shows your health condition across different dimensions.")
+
+    labels = list(result["levels"].keys())
+
+    level_map = {
+        "Healthy": 3,
+        "Warning": 2,
+        "Risk": 1
+    }
+
+    values = [level_map.get(v, 2) for v in result["levels"].values()]
+    values += values[:1]
+
+    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
+    angles += angles[:1]
+
+    fig, ax = plt.subplots(figsize=(5, 5), subplot_kw=dict(polar=True))
+
+    theta = np.linspace(0, 2 * np.pi, 200)
+    ax.fill_between(theta, 0, 1, color="#f8d7da", alpha=0.5)
+    ax.fill_between(theta, 1, 2, color="#fff3cd", alpha=0.5)
+    ax.fill_between(theta, 2, 3, color="#d4edda", alpha=0.5)
+
+    ax.plot(angles, values, color="#2b6cb0", linewidth=2)
+    ax.fill(angles, values, color="#2b6cb0", alpha=0.15)
+
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(labels, fontsize=10)
+
+    ax.set_yticks([1, 2, 3])
+    ax.set_yticklabels(["Risk", "Warning", "Healthy"], fontsize=9)
+    ax.set_ylim(0, 3)
+
+    ax.grid(color="#cccccc", alpha=0.6)
+
+    st.pyplot(fig)
+    st.markdown("---")
+      
     st.subheader("📝 Healthy Report")
     if result["risk_level"] == "High risk":
         st.error(f"Overall assessment: {result['overall']}")
@@ -762,6 +812,8 @@ if st.button("🚀 Generate AI Health Report"):
         st.subheader("💡 Recommendations")
         for item in result["lifestyle"][:3]:
             st.info(item)
+        if not result["red_flags"] and not result["main_concerns"]:
+            lifestyle_items = ["No significant health risks detected. Keep maintaining your healthy lifestyle!"] + lifestyle_items
         st.markdown("---")
 
     st.subheader("📜 History")
@@ -812,5 +864,6 @@ if st.button("🚀 Generate AI Health Report"):
         with col2:
             st.markdown("**Risk Index (%)**")
             st.line_chart(chart_df["risk_percent"], use_container_width=True)
+
     else:
         st.info("No history records yet.")
