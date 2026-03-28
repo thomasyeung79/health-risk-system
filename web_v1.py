@@ -365,19 +365,8 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("### 🩺 Basic Health Information")
-    st.markdown("""
-    <div style="
-        padding:18px;
-        border-radius:16px;
-        background:white;
-        border:1px solid #e9ecef;
-        margin-bottom:20px;
-    ">
-    """, unsafe_allow_html=True)
 
     st.subheader("🧍 Personal Information")
-    st.markdown("</div>", unsafe_allow_html=True)
-    
     weight_kg = st.number_input("Weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
     st.caption("Please enter your weight.")
     height_cm = st.number_input("Height (cm):", min_value=100.0, max_value=250.0, value=170.0)
