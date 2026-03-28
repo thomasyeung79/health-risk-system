@@ -352,6 +352,10 @@ st.markdown("""
 
 st.title("🧠 AI Health Risk System")
 st.caption("Understand your health in 60 seconds")
+st.image(
+    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528",
+    use_container_width=True
+)
 st.markdown("---")
 st.info("Enter your lifestyle data to get a quick health risk assessment and personalised insights.")
 
