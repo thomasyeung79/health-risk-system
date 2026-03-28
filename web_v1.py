@@ -381,6 +381,7 @@ st.markdown("""
     font-weight: 600;
 }
 .small-hero-img img {
+    opacity: 0.65;
     border-radius: 18px;
     max-height: 220px;
     object-fit: cover;
@@ -396,7 +397,7 @@ with left:
     <div class="header-card">
         <div class="header-title">🧠 AI Health Risk System</div>
         <div class="header-subtitle">Understand your health in 60 seconds</div>
-        <div class="header-badge">Lifestyle-based health assessment</div>
+        <div class="header-badge">AI-powered lifestyle health analysist</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -404,10 +405,9 @@ with right:
     st.markdown('<div class="small-hero-img">', unsafe_allow_html=True)
     st.image("https://images.unsplash.com/photo-1505751172876-fa1923c5c528", use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
-st.info("Enter your lifestyle data to get a quick health risk assessment and personalised insights.")
+st.info("Enter your details below to generate your personalised AI health assessment.")
+user_name = st.text_input("👤 Your name")
 st.markdown("---")
-
-user_name = st.text_input("👤 Enter your user name:")
 
 if not user_name:
     st.info("👆 Please enter your name to start the assessment.")
@@ -612,6 +612,9 @@ with col2:
     )
 
 if st.button("🚀 Start Assessment"):
+
+    with st.spinner("Analyzing your health data..."):
+    
     result = run_web_assessment(
         weight_kg,
         height_cm,
