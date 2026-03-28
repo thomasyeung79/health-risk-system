@@ -306,7 +306,7 @@ def run_web_assessment(
         "risk_percent": risk_percent,
         "risk_score": risk_score,
         "interaction_score": interaction_score,
-        "summary": summary,
+        "overall": overall,
         "red_flags": red_flags,
         "main_concerns": main_concerns,
         "lifestyle": lifestyle,
@@ -702,10 +702,6 @@ if st.button("🚀 Generate AI Health Report"):
 
     st.markdown("---")
 
-    st.subheader("📝 Summary")
-    st.info(result["summary"])
-    st.markdown("---")
-
     st.subheader("📊 Key Indicators")
     st.caption("Overview of each health dimension.")
     def show_card(name, level):
@@ -743,6 +739,15 @@ if st.button("🚀 Generate AI Health Report"):
         show_card(k, result["levels"][k])
     st.markdown("---")
 
+    st.subheader("📝 Summary")
+    if result["risk_level"] == "High risk":
+        st.error(f"Overall assessment: {result['overall']}")
+    elif result["risk_level"] == "Medium risk":
+        st.warning(f"Overall assessment: {result['overall']}")
+    else:
+        st.success(f"Overall assessment: {result['overall']}")
+    st.markdown("---")
+    
     if result["red_flags"]:
         st.subheader("🚨 High-Priority Concerns")
         for item in result["red_flags"][:3]:
