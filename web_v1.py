@@ -384,7 +384,7 @@ st.markdown("""
     border-radius: 18px;
     max-height: 220px;
     object-fit: cover;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -404,9 +404,8 @@ with right:
     st.markdown('<div class="small-hero-img">', unsafe_allow_html=True)
     st.image("https://images.unsplash.com/photo-1505751172876-fa1923c5c528", use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
-st.caption("Understand your health in 60 seconds")
-st.markdown("---")
 st.info("Enter your lifestyle data to get a quick health risk assessment and personalised insights.")
+st.markdown("---")
 
 user_name = st.text_input("👤 Enter your user name:")
 
@@ -417,7 +416,18 @@ if not user_name:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("### 🩺 Basic Health Information")
+    st.markdown("""
+    <div style="
+        background:white;
+        padding:20px;
+        border-radius:16px;
+        border:1px solid #e9ecef;
+        margin-bottom:20px;
+    ">
+    """, unsafe_allow_html=True)
+
+    st.subheader("🩺 Basic Health Information")
+    st.markdown("</div>", unsafe_allow_html=True)
     
     st.subheader("🧍 Personal Information")
     st.caption("Enter your basic body information.")
@@ -459,7 +469,18 @@ with col1:
 st.markdown("---")
 
 with col2:
-    st.markdown("### 🌿 Lifestyle & Mental Health")
+    st.markdown("""
+    <div style="
+        background:white;
+        padding:20px;
+        border-radius:16px;
+        border:1px solid #e9ecef;
+        margin-bottom:20px;
+    ">
+    """, unsafe_allow_html=True)
+    st.subheader("🌿 Lifestyle & Mental Health")
+    st.markdown("</div>", unsafe_allow_html=True)
+    
     st.subheader("🥗 Diet")
     st.caption("Tell about your eating habits to assess your diet quality.")
     
@@ -557,7 +578,7 @@ with col2:
         }[x]
     )
 
-if st.button("📊 Assessment Result"):
+if st.button("🚀 Start Assessment"):
     result = run_web_assessment(
         weight_kg,
         height_cm,
