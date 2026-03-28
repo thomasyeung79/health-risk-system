@@ -306,7 +306,7 @@ def run_web_assessment(
         "risk_percent": risk_percent,
         "risk_score": risk_score,
         "interaction_score": interaction_score,
-        "Summary": summary,
+        "summary": summary,
         "overall": overall,
         "red_flags": red_flags,
         "main_concerns": main_concerns,
