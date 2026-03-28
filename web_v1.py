@@ -703,19 +703,7 @@ if st.button("🚀 Generate AI Health Report"):
     st.markdown("---")
 
     st.subheader("📝 Summary")
-    st.markdown("""
-    <div style="
-        background:#eafaf1;
-        padding:16px;
-        border-radius:14px;
-        margin-bottom:16px;
-        border:1px solid #d4edda;
-        font-size:15px;
-    ">
-    <b>🧠 AI Summary:</b><br>
-    result["summary"]
-    </div>
-    """, unsafe_allow_html=True)
+    st.info(result["summary"])
     st.markdown("---")
 
     st.subheader("📊 Key Indicators")
