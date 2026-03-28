@@ -408,7 +408,7 @@ st.markdown("---")
 with col2:
     st.markdown("### 🌿 Lifestyle & Mental Health")
     st.subheader("🥗 Diet")
-    st.caption("Tell us about your eating habits to assess your diet quality.")
+    st.caption("Tell about your eating habits to assess your diet quality.")
     
     fruit_veg_servings = st.number_input(
         "Fruit & vegetable (servings per day):",
