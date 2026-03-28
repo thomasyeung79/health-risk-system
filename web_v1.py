@@ -406,7 +406,7 @@ with col2:
     st.markdown("### 🌿 Lifestyle & Mental Health")
     st.subheader("🥗 Diet")
     fruit_veg_servings = st.number_input(
-        "Fruit and vegetable (servings per day):"
+        "Fruit & vegetable (servings per day):"
         min_value=0.0, max_value=20.0, value=3.0
     )
     st.caption("Please enter your fruit and vegetable servings per day (1 serving ≈ 1 medium fruit or 1/2 cup vegetables).")
