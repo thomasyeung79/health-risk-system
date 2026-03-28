@@ -747,11 +747,11 @@ if st.button("🚀 Generate AI Health Report"):
     st.progress(result["risk_percent"] / 100)
 
     if result["risk_level"] == "High risk":
-        st.error(f"Current risk percentage: {result['risk_percent']:.1f}%")
+        st.error("High risk level detected")
     elif result["risk_level"] == "Medium risk":
-        st.warning(f"Current risk percentage: {result['risk_percent']:.1f}%")
+        st.warning("Moderate risk level")
     else:
-        st.success(f"Current risk percentage: {result['risk_percent']:.1f}%")
+        st.success("Low risk – keep it up!")
         st.markdown("---")
       
     st.markdown("### 🕸️ Health Radar")
