@@ -870,3 +870,6 @@ if st.button("🚀 Generate AI Health Report"):
 
     else:
         st.info("No history records yet.")
+
+
+st.caption("Version 1.0 | Health Risk Assessment System")
