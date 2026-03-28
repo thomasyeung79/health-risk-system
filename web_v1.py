@@ -612,9 +612,15 @@ with col2:
         }[x]
     )
 
-if st.button("🚀 Start Assessment"):
+if st.button("🚀 Generate AI Health Report"):
   with st.spinner("Analyzing your health data..."):
-    time.sleep(1.2)    
+    time.sleep(0.5)
+
+  with st.spinner("Evaluating risk levels..."):
+    time.sleep(0.5)
+
+  with st.spinner("Generating AI insights..."):
+    time.sleep(0.5)    
       
     result = run_web_assessment(
         weight_kg,
@@ -697,7 +703,19 @@ if st.button("🚀 Start Assessment"):
     st.markdown("---")
 
     st.subheader("📝 Summary")
-    st.info(result["summary"])
+    st.markdown("""
+    <div style="
+        background:#eafaf1;
+        padding:16px;
+        border-radius:14px;
+        margin-bottom:16px;
+        border:1px solid #d4edda;
+        font-size:15px;
+    ">
+    <b>🧠 AI Summary:</b><br>
+    result["summary"]
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("---")
 
     st.subheader("📊 Key Indicators")
