@@ -432,6 +432,16 @@ with col1:
     ">
     🩺 Basic Health Information
     </div>
+
+    <div style="
+        font-size:14px;
+        color:#6c757d;
+        margin-bottom:12px;
+    ">
+    Enter your basic body information
+    </div>
+
+    <hr style="margin:10px 0; border:none; border-top:1px solid #eee;">
     
     """, unsafe_allow_html=True)
     
@@ -491,6 +501,16 @@ with col2:
     ">
     🌿 Lifestyle & Mental Health
     </div>
+
+    <div style="
+        font-size:14px;
+        color:#6c757d;
+        margin-bottom:12px;
+    ">
+    Enter your basic body information
+    </div>
+
+    <hr style="margin:10px 0; border:none; border-top:1px solid #eee;">
     
     """, unsafe_allow_html=True)
     
