@@ -366,12 +366,15 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("### 🩺 Basic Health Information")
     st.subheader("👤 Personal Information")
-    weight_kg = st.number_input("Please enter your weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
-    height_cm = st.number_input("Please enter your height (cm):", min_value=100.0, max_value=250.0, value=170.0)
+    weight_kg = st.number_input("Weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
+    st.caption("Please enter your weight.")
+    height_cm = st.number_input("Height (cm):", min_value=100.0, max_value=250.0, value=170.0)
+    st.caption("Please enter your height.")
     st.markdown("---")
 
     st.subheader("💧 Hydration")
-    water_ml = st.number_input("Please enter your actual water consumption (ml):", min_value=0.0, max_value=10000.0, value=2000.0)
+    water = st.number_input("Water intake (ml):")
+    st.caption("Please enter your actual water consumption.")
     situation = st.selectbox(
         "Please choose your situation today:",
         ["A", "B", "C", "D"],
@@ -385,13 +388,17 @@ with col1:
     st.markdown("---")
 
     st.subheader("😴 Sleep")
-    sleep_hours = st.number_input("Please enter the average time of you sleeping for this week (hours):", min_value=0.0, max_value=24.0, value=7.0)
-    night_wake_times = st.number_input("Please enter the average times of waking in night for this week (times):", min_value=0, max_value=20, value=1)
+    sleep_hours = st.number_input("Sleeping (hours):", min_value=0.0, max_value=24.0, value=7.0)
+    st.caption("Please enter the average time of you sleeping for this week.")
+    night_wake_times = st.number_input("Night wake-ups (times):", min_value=0, max_value=20, value=1)
+    st.caption("Please enter the average times of waking in night for this week.")
     st.markdown("---")
 
     st.subheader("🏃 Activity")
-    exercise_minutes = st.number_input("Please enter how long your exercise (minutes):", min_value=0.0, max_value=600.0, value=30.0)
-    sedentary_hours = st.number_input("Please enter how long your sedentary (hours):", min_value=0.0, max_value=24.0, value=6.0)
+    exercise_minutes = st.number_input("Exercise (min/day):", min_value=0.0, max_value=600.0, value=30.0)
+    st.caption("Please enter how long your exercise.")
+    sedentary_hours = st.number_input("Sedentary time (hours/day):", min_value=0.0, max_value=24.0, value=6.0)
+    st.caption("Please enter how long your sedentary.")
 
 st.markdown("---")
 
@@ -399,27 +406,30 @@ with col2:
     st.markdown("### 🌿 Lifestyle & Mental Health")
     st.subheader("🥗 Diet")
     fruit_veg_servings = st.number_input(
-        "Please enter your fruit and vegetable servings per day (servings per day)"
-        "(1 serving ≈ 1 medium fruit or 1/2 cup vegetables):",
+        "Fruit and vegetable (servings per day):"
         min_value=0.0, max_value=20.0, value=3.0
     )
+    st.caption("Please enter your fruit and vegetable servings per day (1 serving ≈ 1 medium fruit or 1/2 cup vegetables).")
 
     fast_food_times = st.number_input(
-        "Please enter the average times of fast food per week (times per week)"
-        "(Includes: McDonald's, KFC, fried food, pizza, takeaway meals):",
+        "Fast food (times per week):"
         min_value=0, max_value=21, value=1
     )
+    st.caption("Please enter the average times of fast food per week (Includes: McDonald's, KFC, fried food, pizza, takeaway meals).")
 
     sugary_drinks = st.number_input(
-        "Please enter your sugary drinks per day (per day)"
-        "(Includes: soft drinks, bubble tea, energy drinks, sweetened juice):",
+        "Sugary drinks (per day):"
         min_value=0, max_value=10, value=1
     )
+    st.caption("Please enter your sugary drinks per day (Includes: soft drinks, bubble tea, energy drinks, sweetened juice).")
+    
     st.markdown("---")
 
     st.subheader("🧠 Mental Health")
+    st.caption("In the past week, have you experienced any of the following issues in these parts? Please choose the quantity you have(0-3):")
+    
     risk_score_emotion = st.selectbox(
-        "In the past week, have you experienced any of the following situations? (Easily get irritated, Easily experience anxiety, and Have significant mood swings). Please choose the quantity you have(0-3):",
+        "Easily get irritated, Easily experience anxiety, and Have significant mood swings.",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -428,8 +438,9 @@ with col2:
             3: "3 - Three issues"
         }[x]
     )
+    
     risk_score_focus = st.selectbox(
-        "In the past week, have you experienced any of the following situations? (Distraction, Not wanting to do things, and Decrease in efficiency). Please choose the quantity you have(0-3):",
+        "Distraction, Not wanting to do things, and Decrease in efficiency.",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -438,8 +449,9 @@ with col2:
             3: "3 - Three issues"
         }[x]
     )
+    
     risk_score_body = st.selectbox(
-        "In the past week, have you experienced any of the following physical reactions? (Easily fatigued, Headache, and Sense of tension). Please choose the quantity you have(0-3):",
+        "Easily fatigued, Headache, and Sense of tension.",
         [0, 1, 2, 3],
         format_func=lambda x: {
             0: "0 - None",
@@ -451,12 +463,15 @@ with col2:
     st.markdown("---")
 
     st.subheader("📱 Screen Time")
-    screen_time_hours = st.number_input("Please enter your average daily screen time (hours):", min_value=0.0, max_value=24.0, value=4.0)
+    screen_time_hours = st.number_input("Screen time (hours/day):", min_value=0.0, max_value=24.0, value=4.0)
+    st.caption("Please enter your average daily screen time.")
     st.markdown("---")
 
     st.subheader("🚭 Habit")
+    st.caption("Please choose your frequency of these habits everyday.")
+    
     smoking = st.selectbox(
-        "Please choose your smoking frequency everyday:",
+        "Smoking:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
@@ -464,8 +479,9 @@ with col2:
             2: "2 - Frequently"
         }[x]
     )
+    
     alcohol = st.selectbox(
-        "Please choose your alcohol consumption everyday:",
+        "Alcohol:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
@@ -474,7 +490,7 @@ with col2:
         }[x]
     )
     late_night = st.selectbox(
-        "Please choose your late-night habit everyday:",
+        "Late-night:",
         [0, 1, 2],
         format_func=lambda x: {
             0: "0 - Never",
