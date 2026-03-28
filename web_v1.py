@@ -350,7 +350,60 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🧠 AI Health Risk System")
+st.markdown("""
+<style>
+.header-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.header-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #212529;
+    margin-bottom: 8px;
+}
+.header-subtitle {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 16px;
+}
+.header-badge {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #eef7ff;
+    color: #2b6cb0;
+    font-size: 14px;
+    font-weight: 600;
+}
+.small-hero-img img {
+    border-radius: 18px;
+    max-height: 220px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+</style>
+""", unsafe_allow_html=True)
+
+left, right = st.columns([1.8, 1])
+
+with left:
+    st.markdown("""
+    <div class="header-card">
+        <div class="header-title">🧠 AI Health Risk System</div>
+        <div class="header-subtitle">Understand your health in 60 seconds</div>
+        <div class="header-badge">Lifestyle-based health assessment</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with right:
+    st.markdown('<div class="small-hero-img">', unsafe_allow_html=True)
+    st.image("https://images.unsplash.com/photo-1505751172876-fa1923c5c528", use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 st.caption("Understand your health in 60 seconds")
 st.markdown("---")
 st.info("Enter your lifestyle data to get a quick health risk assessment and personalised insights.")
