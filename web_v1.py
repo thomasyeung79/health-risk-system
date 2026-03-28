@@ -483,10 +483,16 @@ with col2:
         border:1px solid #e9ecef;
         margin-bottom:20px;
     ">
+
+    <div style="
+        font-size:20px;
+        font-weight:700;
+        margin-bottom:12px;
+    ">
+    🌿 Lifestyle & Mental Health
+    </div>
+    
     """, unsafe_allow_html=True)
-    st.subheader("🌿 Lifestyle & Mental Health")
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("---")
     
     st.subheader("🥗 Diet")
     st.caption("Tell about your eating habits to assess your diet quality.")
