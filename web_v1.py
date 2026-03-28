@@ -11,6 +11,9 @@ import streamlit as st
 import mysql.connector
 import pandas as pd
 import time
+import streamlit as st
+import matplotlib.pyplot as plt
+import numpy as np
 
 st.set_page_config(page_title="AI Health Risk System", layout="wide")
 
