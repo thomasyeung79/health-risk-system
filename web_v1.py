@@ -10,6 +10,7 @@ from habit import calc_habit
 import streamlit as st
 import mysql.connector
 import pandas as pd
+import time
 
 st.set_page_config(page_title="AI Health Risk System", layout="wide")
 
@@ -614,6 +615,7 @@ with col2:
 if st.button("🚀 Start Assessment"):
   with st.spinner("Analyzing your health data..."):
     time.sleep(1.2)    
+      
     result = run_web_assessment(
         weight_kg,
         height_cm,
