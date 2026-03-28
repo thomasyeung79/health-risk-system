@@ -89,7 +89,7 @@ def save_to_db(user_name, result):
         result["risk_percent"],
         result["health_score"],
         result["risk_level"],
-        result["overall"]
+        result["summary"]
     )
 
     cursor.execute(sql, values)
@@ -306,6 +306,7 @@ def run_web_assessment(
         "risk_percent": risk_percent,
         "risk_score": risk_score,
         "interaction_score": interaction_score,
+        "Summary": summary,
         "overall": overall,
         "red_flags": red_flags,
         "main_concerns": main_concerns,
