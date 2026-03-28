@@ -373,8 +373,8 @@ with col1:
     st.markdown("---")
 
     st.subheader("💧 Hydration")
-    water_ml = st.number_input("Water intake (ml):")
-    st.caption("Please enter your actual water consumption.", min_value=0.0, max_value=100000.0, value=2000.0)
+    water_ml = st.number_input("Water intake (ml):", min_value=0.0, max_value=100000.0, value=2000.0)
+    st.caption("Please enter your actual water consumption.")
     situation = st.selectbox(
         "Please choose your situation today:",
         ["A", "B", "C", "D"],
