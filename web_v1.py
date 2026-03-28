@@ -406,19 +406,19 @@ with col2:
     st.markdown("### 🌿 Lifestyle & Mental Health")
     st.subheader("🥗 Diet")
     fruit_veg_servings = st.number_input(
-        "Fruit & vegetable (servings per day):"
+        "Fruit & vegetable (servings per day):",
         min_value=0.0, max_value=20.0, value=3.0
     )
     st.caption("Please enter your fruit and vegetable servings per day (1 serving ≈ 1 medium fruit or 1/2 cup vegetables).")
 
     fast_food_times = st.number_input(
-        "Fast food (times per week):"
+        "Fast food (times per week):",
         min_value=0, max_value=21, value=1
     )
     st.caption("Please enter the average times of fast food per week (Includes: McDonald's, KFC, fried food, pizza, takeaway meals).")
 
     sugary_drinks = st.number_input(
-        "Sugary drinks (per day):"
+        "Sugary drinks (per day):",
         min_value=0, max_value=10, value=1
     )
     st.caption("Please enter your sugary drinks per day (Includes: soft drinks, bubble tea, energy drinks, sweetened juice).")
