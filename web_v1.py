@@ -612,9 +612,8 @@ with col2:
     )
 
 if st.button("🚀 Start Assessment"):
-
-    with st.spinner("Analyzing your health data..."):
-    
+  with st.spinner("Analyzing your health data..."):
+    time.sleep(1.2)    
     result = run_web_assessment(
         weight_kg,
         height_cm,
