@@ -507,7 +507,7 @@ with col2:
         color:#6c757d;
         margin-bottom:12px;
     ">
-    Enter your basic body information
+    Enter your lifestyle and mental Health
     </div>
 
     <hr style="margin:10px 0; border:none; border-top:1px solid #eee;">
