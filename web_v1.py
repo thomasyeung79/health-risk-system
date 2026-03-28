@@ -407,11 +407,11 @@ with right:
     st.markdown("</div>", unsafe_allow_html=True)
 st.info("Enter your details below to generate your personalised AI health assessment.")
 user_name = st.text_input("👤 Your name")
-st.markdown("---")
 
 if not user_name:
     st.info("👆 Please enter your name to start the assessment.")
     st.stop()
+st.markdown("---")
 
 col1, col2 = st.columns(2)
 
