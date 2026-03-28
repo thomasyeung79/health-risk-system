@@ -428,6 +428,7 @@ with col1:
 
     st.subheader("🩺 Basic Health Information")
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("---")
     
     st.subheader("🧍 Personal Information")
     st.caption("Enter your basic body information.")
@@ -480,6 +481,7 @@ with col2:
     """, unsafe_allow_html=True)
     st.subheader("🌿 Lifestyle & Mental Health")
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("---")
     
     st.subheader("🥗 Diet")
     st.caption("Tell about your eating habits to assess your diet quality.")
