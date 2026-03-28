@@ -365,17 +365,18 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("### 🩺 Basic Health Information")
-
+    
     st.subheader("🧍 Personal Information")
+    st.caption("Enter your basic body information.")
     weight_kg = st.number_input("Weight (kg):", min_value=30.0, max_value=300.0, value=70.0)
-    st.caption("Please enter your weight.")
+    st.caption("Your current body weight.")
     height_cm = st.number_input("Height (cm):", min_value=100.0, max_value=250.0, value=170.0)
-    st.caption("Please enter your height.")
+    st.caption("Your current height.")
     st.markdown("---")
 
     st.subheader("💧 Hydration")
     water_ml = st.number_input("Water intake (ml):", min_value=0.0, max_value=100000.0, value=2000.0)
-    st.caption("Please enter your actual water consumption.")
+    st.caption("Total daily water intake.")
     situation = st.selectbox(
         "Please choose your situation today:",
         ["A", "B", "C", "D"],
@@ -386,20 +387,21 @@ with col1:
             "D": "D - Exercised or sweating in hot weather"
         }[x]
     )
+    st.caption("Your hydration status today")
     st.markdown("---")
 
     st.subheader("😴 Sleep")
     sleep_hours = st.number_input("Sleeping (hours):", min_value=0.0, max_value=24.0, value=7.0)
-    st.caption("Please enter the average time of you sleeping for this week.")
+    st.caption("Average sleep duration per night.")
     night_wake_times = st.number_input("Night wake-ups (times):", min_value=0, max_value=20, value=1)
-    st.caption("Please enter the average times of waking in night for this week.")
+    st.caption("Number of times you wake up during sleep.")
     st.markdown("---")
 
     st.subheader("🏃 Activity")
     exercise_minutes = st.number_input("Exercise (min/day):", min_value=0.0, max_value=600.0, value=30.0)
-    st.caption("Please enter how long your exercise.")
+    st.caption("Daily exercise or physical activity time.")
     sedentary_hours = st.number_input("Sedentary time (hours/day):", min_value=0.0, max_value=24.0, value=6.0)
-    st.caption("Please enter how long your sedentary.")
+    st.caption("Time spent sitting or inactive.")
 
 st.markdown("---")
 
@@ -410,24 +412,24 @@ with col2:
         "Fruit & vegetable (servings per day):",
         min_value=0.0, max_value=20.0, value=3.0
     )
-    st.caption("Please enter your fruit and vegetable servings per day (1 serving ≈ 1 medium fruit or 1/2 cup vegetables).")
+    st.caption("1 serving ≈ 1 medium fruit or 1/2 cup vegetables.")
 
     fast_food_times = st.number_input(
         "Fast food (times per week):",
         min_value=0, max_value=21, value=1
     )
-    st.caption("Please enter the average times of fast food per week (Includes: McDonald's, KFC, fried food, pizza, takeaway meals).")
+    st.caption("Includes: McDonald's, KFC, fried food, pizza, takeaway meals.")
 
     sugary_drinks = st.number_input(
         "Sugary drinks (per day):",
         min_value=0, max_value=10, value=1
     )
-    st.caption("Please enter your sugary drinks per day (Includes: soft drinks, bubble tea, energy drinks, sweetened juice).")
+    st.caption("Includes: soft drinks, bubble tea, energy drinks, sweetened juice,etc.")
     
     st.markdown("---")
 
     st.subheader("🧠 Mental Health")
-    st.caption("In the past week, have you experienced any of the following issues in these parts? Please choose the quantity you have(0-3):")
+    st.caption("In the past week, have you experienced any of the following issues in these parts? Choose the quantity you have(0-3):")
     
     risk_score_emotion = st.selectbox(
         "Easily get irritated, Easily experience anxiety, and Have significant mood swings.",
@@ -465,11 +467,11 @@ with col2:
 
     st.subheader("📱 Screen Time")
     screen_time_hours = st.number_input("Screen time (hours/day):", min_value=0.0, max_value=24.0, value=4.0)
-    st.caption("Please enter your average daily screen time.")
+    st.caption("Total screen time per day (phone, computer, TV).")
     st.markdown("---")
 
     st.subheader("🚭 Habit")
-    st.caption("Please choose your frequency of these habits everyday.")
+    st.caption("Daily lifestyle habits.")
     
     smoking = st.selectbox(
         "Smoking:",
@@ -586,7 +588,7 @@ if st.button("📊 Assessment Result"):
     st.markdown("---")
 
     st.subheader("📊 Key Indicators")
-    st.caption("These indicators summarise the condition of each health dimension.")
+    st.caption("Overview of each health dimension.")
     def show_card(name, level):
         if "High" in level:
             status = "Dangerous"
