@@ -89,7 +89,7 @@ def save_to_db(user_name, result):
         result["risk_percent"],
         result["health_score"],
         result["risk_level"],
-        result["summary"]
+        result["overall"]
     )
 
     cursor.execute(sql, values)
