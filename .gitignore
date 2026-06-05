@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+*.csv
+health_history.json
+insight_records.json
+wellnest_users.json
