@@ -74,11 +74,6 @@ INTERACTION_TEXT = {
     },
 }
 
-LEVEL_TEXT = {
-    "English": {"healthy": "Healthy", "low": "Low Risk", "medium": "Medium Risk", "high": "High Risk"},
-    "中文": {"healthy": "健康", "low": "低风险", "medium": "中风险", "high": "高风险"},
-}
-
 OVERALL_TEXT = {
     "English": {
         "healthy": "Your overall pattern looks stable. The best next step is to maintain what is already working instead of making drastic changes.",
@@ -167,7 +162,7 @@ def calculate_overall_result(results, language):
     else:
         risk_level_key = "healthy"
 
-    risk_level = LEVEL_TEXT[language][risk_level_key]
+    risk_level = LEVEL_TEXTS[language][risk_level_key]
     overall = OVERALL_TEXT[language][risk_level_key]
 
     # ── Priority focus ──────────────────────────────
