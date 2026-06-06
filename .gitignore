@@ -5,3 +5,10 @@ __pycache__/
 health_history.json
 insight_records.json
 wellnest_users.json
+dist/
+build/
+*.spec
+*.ico
+app_icon.svg
+build_app.py
+build_icon.py
