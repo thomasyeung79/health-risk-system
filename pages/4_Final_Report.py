@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 import pandas as pd
-from openai import OpenAI
 
 from database import load_json, filter_user, HEALTH_JSON, MIND_JSON
 from modules.ui import (
@@ -140,6 +139,32 @@ TEXT = {
 }
 
 t = TEXT[language]
+
+# ── Backend API availability ───────────────────────
+BACKEND_AVAILABLE = False
+try:
+    from api_client.client import ApiClient
+    from api_client.report_client import ReportClient
+
+    if "api_client" in st.session_state:
+        _client = st.session_state["api_client"]
+    else:
+        _client = ApiClient()
+        st.session_state["api_client"] = _client
+
+    if st.session_state.get("access_token"):
+        _client.set_tokens(
+            st.session_state["access_token"],
+            st.session_state.get("refresh_token", ""),
+        )
+
+    _health = _client.get("/health")
+    if _health.get("status") == "ok" and _client.is_authenticated:
+        BACKEND_AVAILABLE = True
+        report_api = ReportClient(_client)
+except Exception:
+    pass
+
 
 render_topbar(language, user_name)
 render_nav(language, "pages/4_Final_Report.py")
@@ -785,19 +810,12 @@ else:
         default=t["style_balanced"],
     )
 
-    model_options = ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
-    selected_model = st.selectbox(
-        "AI Model" if language == "English" else "AI 模型",
-        model_options,
-        index=0,
-        help="Choose the AI model for report generation" if language == "English" else "选择生成报告的 AI 模型"
-    )
-
-    use_ollama = st.checkbox(
-        "Use local AI (Ollama)" if language == "English" else "使用本地 AI（Ollama）",
-        value=False,
-        help="Use Ollama local AI instead of OpenAI" if language == "English" else "使用 Ollama 本地 AI 替代 OpenAI"
-    )
+    def _api_report_to_markdown(api_result):
+        """Convert API report sections back to markdown for display."""
+        parts = [api_result["report"]["summary"]]
+        for s in api_result["report"]["sections"]:
+            parts.append(f"\n## {s['title']}\n{s['content']}")
+        return "\n".join(parts).strip()
 
     if st.button(
         t["generate"],
@@ -808,8 +826,26 @@ else:
             t["loading"]
         ):
 
-            if not os.environ.get("OPENAI_API_KEY") and not use_ollama:
-                st.warning(t["ai_error"])
+            api_success = False
+            report = ""
+
+            if BACKEND_AVAILABLE:
+                try:
+                    api_result = report_api.generate(
+                        language=language,
+                        style=report_style.lower() if report_style else "balanced",
+                        days=7,
+                    )
+                    report = _api_report_to_markdown(api_result)
+                    api_success = True
+                except Exception:
+                    st.warning(
+                        "Backend report API unavailable, using local fallback."
+                        if language == "English"
+                        else "后端报告 API 不可用，使用本地回退。"
+                    )
+
+            if not api_success:
                 report = generate_local_report(
                     user_name,
                     latest_health,
@@ -817,31 +853,8 @@ else:
                     history_summary,
                     report_style,
                     language,
-                    selected_model
+                    "gpt-4o-mini",
                 )
-            else:
-                try:
-                    report = generate_final_report(
-                        user_name,
-                        latest_health,
-                        latest_mind,
-                        history_summary,
-                        report_style,
-                        language,
-                        selected_model,
-                        use_ollama
-                    )
-                except Exception:
-                    st.warning(t["fallback_notice"])
-                    report = generate_local_report(
-                        user_name,
-                        latest_health,
-                        latest_mind,
-                        history_summary,
-                        report_style,
-                        language,
-                        selected_model
-                    )
 
         render_panel(t["insight_title"])
         st.markdown(report)
