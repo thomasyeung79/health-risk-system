@@ -7,9 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml ./
+COPY app/ ./app/
+
 RUN pip install --no-cache-dir -e ".[dev]"
 
-COPY app/ ./app/
 COPY alembic.ini ./
 COPY alembic/ ./alembic/
 COPY scripts/ ./scripts/
