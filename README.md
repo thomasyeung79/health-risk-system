@@ -390,6 +390,31 @@ Required variables:
 
 ---
 
+## Deployment Safety Checklist
+
+Before deploying to production, verify these items:
+
+### Required
+- [ ] `JWT_SECRET` is set to a random 64-character string (run `python -c "import secrets; print(secrets.token_hex(32))"`)
+- [ ] `DEBUG` is set to `false`
+- [ ] `CORS_ORIGINS` is restricted to your frontend domain(s) (not `*`)
+- [ ] `restart: unless-stopped` is enabled in `docker-compose.yml` (already done ✓)
+- [ ] SQLite data volume is backed up regularly (add to crontab)
+
+### Recommended
+- [ ] Set up monitoring (e.g., `docker ps`, health endpoint polling)
+- [ ] Configure `uvicorn --workers 4` for multi-process mode
+- [ ] Add a reverse proxy (nginx) for SSL termination
+- [ ] Configure log rotation (already done in docker-compose.yml ✓)
+
+### Verify Locally
+```bash
+cd AI_Wellness_Platform/backend
+python -c "from app.config import settings; issues = settings.check_production_readiness(); [print(f'  ⚠️  {i}') for i in issues]"
+```
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.

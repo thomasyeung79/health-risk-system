@@ -4,6 +4,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: ai-wellness-backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
@@ -18,12 +19,18 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: ai-wellness-frontend
+    restart: unless-stopped
     ports:
       - "8501:8501"
     depends_on:
@@ -33,6 +40,11 @@ services:
       - API_BASE_URL=http://backend:8000
     env_file:
       - .env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   sqlite_data:
