@@ -1,4 +1,4 @@
-"""Tests for the report engine: context builder, provider, cache, service."""
+﻿"""Tests for the report engine: context builder, provider, cache, service."""
 
 import json
 from unittest.mock import ANY, MagicMock, patch
@@ -18,39 +18,39 @@ from app.services.report_engine.report_service import generate_report
 
 class TestContextBuilder:
     def test_empty_db(self, db_session):
-        ctx = build_context(db_session, "English")
+        ctx = build_context(db_session, 1, "English")
         assert ctx["has_health_data"] is False
         assert ctx["has_emotion_data"] is False
         assert ctx["health_summary"] is None
 
     def test_with_health_data(self, db_session):
         from app.models.health_record import HealthRecord
-        db_session.add(HealthRecord(health_score=85.0, risk_level="Low Risk", language="English"))
+        db_session.add(HealthRecord(user_id=1, health_score=85.0, risk_level="Low Risk", language="English"))
         db_session.flush()
-        ctx = build_context(db_session, "English")
+        ctx = build_context(db_session, 1, "English")
         assert ctx["has_health_data"] is True
         assert ctx["health_summary"]["health_score"] == 85.0
 
     def test_with_emotion_data(self, db_session):
         from app.models.emotion_record import EmotionRecord
-        db_session.add(EmotionRecord(mood_key="Calm", stress=3, energy=7, language="English"))
+        db_session.add(EmotionRecord(user_id=1, mood_key="Calm", stress=3, energy=7, language="English"))
         db_session.flush()
-        ctx = build_context(db_session, "English")
+        ctx = build_context(db_session, 1, "English")
         assert ctx["has_emotion_data"] is True
         assert ctx["emotion_summary"]["mood_key"] == "Calm"
 
     def test_chinese(self, db_session):
-        ctx = build_context(db_session, "中文")
+        ctx = build_context(db_session, 1, "中文")
         assert ctx["language"] == "中文"
 
     def test_high_risk_flags(self, db_session):
         from app.models.health_record import HealthRecord
         db_session.add(HealthRecord(
-            health_score=30.0, risk_level="High Risk", language="English",
+            user_id=1, health_score=30.0, risk_level="High Risk", language="English",
             sleep_score=3, bmi_score=3,
         ))
         db_session.flush()
-        ctx = build_context(db_session, "English")
+        ctx = build_context(db_session, 1, "English")
         assert len(ctx["flags"]) >= 2
 
 
@@ -118,19 +118,19 @@ class TestParser:
 
 class TestCache:
     def test_miss(self, db_session):
-        r = get_cached_report(db_session, "English", "balanced", "local")
+        r = get_cached_report(db_session, 1, "English", "balanced", "local")
         assert r is None
 
     def test_hit(self, db_session):
-        save_report(db=db_session, language="English", style="balanced", provider="local",
+        save_report(db=db_session, user_id=1, language="English", style="balanced", provider="local",
                      model="t", health_record_id=None, emotion_record_id=None,
                      days_analyzed=7, summary="Cached", sections="[]", raw_output="t",
                      tokens_used=0, latency_ms=0, is_fallback=True)
-        r = get_cached_report(db_session, "English", "balanced", "local")
+        r = get_cached_report(db_session, 1, "English", "balanced", "local")
         assert r is not None
 
     def test_save_fields(self, db_session):
-        r = save_report(db=db_session, language="English", style="coaching", provider="deepseek",
+        r = save_report(db=db_session, user_id=1, language="English", style="coaching", provider="deepseek",
                          model="dc", health_record_id=1, emotion_record_id=2,
                          days_analyzed=7, summary="S", sections="[]", raw_output="R",
                          tokens_used=150, latency_ms=500, is_fallback=False)
@@ -144,33 +144,36 @@ class TestCache:
 class TestReportService:
     def test_no_api_key(self, db_session):
         with patch.dict("os.environ", {}, clear=True):
-            r = generate_report(db_session, "English", "balanced")
+            r = generate_report(db_session, 1, "English", "balanced")
             assert r["provider"] == "local"
             assert r["is_fallback"] is False
             assert r["report"]["summary"] is not None
 
     def test_with_health_data(self, db_session):
         from app.models.health_record import HealthRecord
-        db_session.add(HealthRecord(health_score=85.0, risk_level="Low Risk", language="English"))
+        db_session.add(HealthRecord(user_id=1, health_score=85.0, risk_level="Low Risk", language="English"))
         db_session.flush()
         with patch.dict("os.environ", {}, clear=True):
-            r = generate_report(db_session, "English", "balanced")
+            r = generate_report(db_session, 1, "English", "balanced")
             assert r["report"]["summary"] is not None
 
     def test_chinese(self, db_session):
         with patch.dict("os.environ", {}, clear=True):
-            r = generate_report(db_session, "中文", "balanced")
+            r = generate_report(db_session, 1, "中文", "balanced")
             assert r["language"] == "中文"
 
     def test_cache_on_second_call(self, db_session):
         with patch.dict("os.environ", {}, clear=True):
-            r1 = generate_report(db_session, "English", "balanced")
-            r2 = generate_report(db_session, "English", "balanced")
+            r1 = generate_report(db_session, 1, "English", "balanced")
+            r2 = generate_report(db_session, 1, "English", "balanced")
             assert r2["is_cached"] is True
             assert r2["id"] == r1["id"]
 
     def test_different_style_no_cache(self, db_session):
         with patch.dict("os.environ", {}, clear=True):
-            r1 = generate_report(db_session, "English", "balanced")
-            r2 = generate_report(db_session, "English", "coaching")
+            r1 = generate_report(db_session, 1, "English", "balanced")
+            r2 = generate_report(db_session, 1, "English", "coaching")
             assert r2["is_cached"] is False
+
+
+

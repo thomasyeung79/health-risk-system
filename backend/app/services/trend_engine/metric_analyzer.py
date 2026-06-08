@@ -12,6 +12,7 @@ from app.services.trend_engine.config import METRICS, MetricDef
 
 def compute_metric_trend(
     db: Session,
+    user_id: int,
     metric_key: str,
     days: int = 7,
 ) -> dict[str, Any]:
@@ -36,7 +37,10 @@ def compute_metric_trend(
     if metric_def.source == "health":
         records = (
             db.query(HealthRecord)
-            .filter(HealthRecord.created_at >= cutoff)
+            .filter(
+                HealthRecord.user_id == user_id,
+                HealthRecord.created_at >= cutoff,
+            )
             .order_by(HealthRecord.created_at.asc())
             .all()
         )
@@ -44,7 +48,10 @@ def compute_metric_trend(
     elif metric_def.source == "emotion":
         records = (
             db.query(EmotionRecord)
-            .filter(EmotionRecord.created_at >= cutoff)
+            .filter(
+                EmotionRecord.user_id == user_id,
+                EmotionRecord.created_at >= cutoff,
+            )
             .order_by(EmotionRecord.created_at.asc())
             .all()
         )

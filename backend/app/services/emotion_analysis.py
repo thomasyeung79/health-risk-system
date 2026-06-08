@@ -13,6 +13,7 @@ from app.models.emotion_record import EmotionRecord
 
 def analyze_emotion(
     db: Session,
+    user_id: int,
     language: str,
     *,
     mood_key: str,
@@ -30,6 +31,7 @@ def analyze_emotion(
     )
 
     record = EmotionRecord(
+        user_id=user_id,
         language=language,
         mood_key=mood_key,
         event_key=event_key,

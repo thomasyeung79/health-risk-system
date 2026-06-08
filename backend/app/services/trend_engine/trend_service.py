@@ -13,6 +13,7 @@ from app.services.trend_engine.metric_analyzer import compute_metric_trend
 
 def compute_summary(
     db: Session,
+    user_id: int,
     days: int = 7,
     language: str = "English",
 ) -> dict[str, Any]:
@@ -21,17 +22,23 @@ def compute_summary(
 
     health_count = (
         db.query(HealthRecord)
-        .filter(HealthRecord.created_at >= cutoff)
+        .filter(
+            HealthRecord.user_id == user_id,
+            HealthRecord.created_at >= cutoff,
+        )
         .count()
     )
     emotion_count = (
         db.query(EmotionRecord)
-        .filter(EmotionRecord.created_at >= cutoff)
+        .filter(
+            EmotionRecord.user_id == user_id,
+            EmotionRecord.created_at >= cutoff,
+        )
         .count()
     )
 
     metric_keys = ["health_score", "stress", "energy", "sleep_score"]
-    metrics = [compute_metric_trend(db, k, days) for k in metric_keys]
+    metrics = [compute_metric_trend(db, user_id, k, days) for k in metric_keys]
 
     # Overall direction: majority vote
     direction_counts: dict[str, int] = {}

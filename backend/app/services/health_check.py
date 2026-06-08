@@ -21,6 +21,7 @@ from app.services.health_analyzer import calculate_overall_result
 
 def run_health_check(
     db: Session,
+    user_id: int,
     language: str,
     *,
     weight_kg: float,
@@ -68,6 +69,7 @@ def run_health_check(
 
     # Persist to database
     record = HealthRecord(
+        user_id=user_id,
         language=language,
         weight_kg=weight_kg,
         height_cm=height_cm,

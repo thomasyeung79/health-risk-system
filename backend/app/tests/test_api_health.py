@@ -1,4 +1,4 @@
-"""Integration tests for health check API endpoints."""
+﻿"""Integration tests for health check API endpoints."""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -35,7 +35,7 @@ SAMPLE_PAYLOAD = {
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, auth_headers):
     """Create a TestClient that uses the test DB session."""
 
     def override_get_db():
@@ -43,6 +43,7 @@ def client(db_session):
 
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
+        c.headers.update(auth_headers)
         yield c
     app.dependency_overrides.clear()
 
@@ -188,3 +189,5 @@ class TestStats:
         assert data["total_records"] == 1
         assert data["average_health_score"] == 100.0
         assert data["latest_risk_level"] == "Healthy"
+
+

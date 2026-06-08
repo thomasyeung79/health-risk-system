@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.health_record import HealthRecord
+from app.models.user import User
+from app.services.auth import get_current_user
 from app.schemas.health import (
     HealthCheckRequest,
     HealthCheckResponse,
@@ -22,10 +24,15 @@ router = APIRouter(prefix="/api/v1/health", tags=["health"])
 
 
 @router.post("/check", response_model=HealthCheckResponse)
-def post_health_check(body: HealthCheckRequest, db: Session = Depends(get_db)):
+def post_health_check(
+    body: HealthCheckRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Run a full health assessment and persist results."""
     result = run_health_check(
         db=db,
+        user_id=current_user.id,
         language=body.language,
         weight_kg=body.weight_kg,
         height_cm=body.height_cm,
@@ -76,9 +83,12 @@ def list_health_records(
     limit: int = Query(default=10, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """List health records with pagination."""
-    query = db.query(HealthRecord).order_by(HealthRecord.created_at.desc())
+    query = db.query(HealthRecord).filter(
+        HealthRecord.user_id == current_user.id
+    ).order_by(HealthRecord.created_at.desc())
     total = query.count()
     records = query.offset(offset).limit(limit).all()
 
@@ -103,10 +113,14 @@ def list_health_records(
 
 
 @router.get("/records/{record_id}", response_model=HealthRecordDetail)
-def get_health_record(record_id: int, db: Session = Depends(get_db)):
+def get_health_record(
+    record_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get a single health record by ID."""
     record = db.get(HealthRecord, record_id)
-    if record is None:
+    if record is None or record.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Record not found")
 
     return HealthRecordDetail(
@@ -155,15 +169,19 @@ def get_health_record(record_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/stats", response_model=HealthStatsResponse)
-def get_health_stats(db: Session = Depends(get_db)):
+def get_health_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get aggregated health statistics."""
-    total = db.query(HealthRecord).count()
+    base = db.query(HealthRecord).filter(HealthRecord.user_id == current_user.id)
+    total = base.count()
 
-    avg = db.query(func.avg(HealthRecord.health_score)).scalar()
+    avg = base.with_entities(func.avg(HealthRecord.health_score)).scalar()
     average_health_score = round(avg, 1) if avg is not None else None
 
     latest = (
-        db.query(HealthRecord.risk_level)
+        base.with_entities(HealthRecord.risk_level)
         .order_by(HealthRecord.created_at.desc())
         .first()
     )

@@ -3,10 +3,7 @@ from datetime import datetime
 
 from modules.ui import (
     apply_product_theme,
-    authenticate_user,
     is_authenticated,
-    logout,
-    register_user,
     render_hero,
     render_feature_strip,
     render_journey_steps,
@@ -15,6 +12,34 @@ from modules.ui import (
     render_section_label,
     render_topbar,
 )
+
+# Try to initialize API client for backend connection
+BACKEND_AVAILABLE = False
+try:
+    from api_client.client import ApiClient
+    from api_client.auth_client import AuthClient as ApiAuthClient
+
+    if "api_client" not in st.session_state:
+        _client = ApiClient()
+        st.session_state["api_client"] = _client
+        st.session_state["api_auth_client"] = ApiAuthClient(_client)
+        # Try connecting
+        _health = _client.get("/health")
+        if _health.get("status") == "ok":
+            BACKEND_AVAILABLE = True
+    else:
+        BACKEND_AVAILABLE = True
+except Exception:
+    # Backend not available — will use legacy mode
+    pass
+
+# Restore tokens to API client from session state on page reload
+if BACKEND_AVAILABLE and st.session_state.get("access_token"):
+    client = st.session_state["api_client"]
+    client.set_tokens(
+        st.session_state["access_token"],
+        st.session_state.get("refresh_token", ""),
+    )
 
 st.set_page_config(
     page_title="WellNest AI",
@@ -161,75 +186,162 @@ render_section_label("Workspace" if language == "English" else "工作台")
 
 if not is_authenticated():
     st.info(t["locked"])
-    login_tab, register_tab = st.tabs([t["login_tab"], t["register_tab"]])
 
-    with login_tab:
-        login_name = st.text_input(
-            t["name_input"],
-            value=user_name,
-            key="login_user_name",
+    if BACKEND_AVAILABLE:
+        # New backend login flow
+        login_tab, register_tab = st.tabs([t["login_tab"], t["register_tab"]])
+
+        with login_tab:
+            login_name = st.text_input(
+                t["name_input"],
+                value=user_name,
+                key="login_user_name",
+            )
+            login_password = st.text_input(
+                t["password_input"],
+                type="password",
+                key="login_password",
+            )
+
+            if st.button(t["confirm"], use_container_width=True, key="login_button"):
+                if not login_name.strip():
+                    st.error(t["name_error"])
+                    st.stop()
+
+                auth = st.session_state["api_auth_client"]
+                try:
+                    result = auth.login(login_name.strip(), login_password)
+                    user = result["user"]
+                    st.session_state["access_token"] = st.session_state["api_client"].access_token
+                    st.session_state["refresh_token"] = st.session_state["api_client"].refresh_token
+                    st.session_state["api_user"] = user
+                    st.session_state["user_name"] = user["username"]
+                    st.session_state["authenticated"] = True
+                    st.session_state["session_start"] = datetime.now()
+                    st.session_state["language"] = language
+                    st.success(t["saved"])
+                    st.rerun()
+                except Exception:
+                    st.error(t["password_error"])
+
+        with register_tab:
+            register_name = st.text_input(
+                t["name_input"],
+                key="register_user_name",
+            )
+            register_password = st.text_input(
+                t["password_input"],
+                type="password",
+                key="register_password",
+            )
+            register_password_confirm = st.text_input(
+                t["confirm_password"],
+                type="password",
+                key="register_password_confirm",
+            )
+
+            if st.button(t["create_account"], use_container_width=True, key="register_button"):
+                if not register_name.strip():
+                    st.error(t["name_error"])
+                    st.stop()
+
+                if len(register_password) < 6:
+                    st.error(t["password_short"])
+                    st.stop()
+
+                if register_password != register_password_confirm:
+                    st.error(t["password_mismatch"])
+                    st.stop()
+
+                auth = st.session_state["api_auth_client"]
+                try:
+                    auth.register(
+                        username=register_name.strip(),
+                        password=register_password,
+                        display_name=register_name.strip(),
+                        preferred_language=language,
+                    )
+                    st.success(t["register_success"])
+                except Exception:
+                    st.error(t["user_exists"])
+    else:
+        # Legacy fallback login (no backend available)
+        st.warning(
+            "⚠️ Backend server not detected. Using legacy local login."
+            if language == "English"
+            else "⚠️ 未检测到后端服务器，使用本地登录模式。"
         )
-        login_password = st.text_input(
-            t["password_input"],
-            type="password",
-            key="login_password",
-        )
+        from modules.ui import authenticate_user, register_user
 
-        if st.button(t["confirm"], use_container_width=True, key="login_button"):
-            if not login_name.strip():
-                st.error(t["name_error"])
-                st.stop()
+        login_tab, register_tab = st.tabs([t["login_tab"], t["register_tab"]])
 
-            if not authenticate_user(login_name, login_password):
-                st.error(t["password_error"])
-                st.stop()
+        with login_tab:
+            login_name = st.text_input(
+                t["name_input"],
+                value=user_name,
+                key="login_user_name_legacy",
+            )
+            login_password = st.text_input(
+                t["password_input"],
+                type="password",
+                key="login_password_legacy",
+            )
 
-            st.session_state["language"] = language
-            st.session_state["user_name"] = login_name.strip()
-            st.session_state["authenticated"] = True
-            st.session_state["session_start"] = datetime.now()
-            st.session_state["assessment_completed"] = True
-            st.session_state["assessment_data"] = {
-                "user_name": login_name.strip(),
-                "language": language
-            }
-            st.success(t["saved"])
-            st.rerun()
+            if st.button(t["confirm"], use_container_width=True, key="login_button_legacy"):
+                if not login_name.strip():
+                    st.error(t["name_error"])
+                    st.stop()
 
-    with register_tab:
-        register_name = st.text_input(
-            t["name_input"],
-            key="register_user_name",
-        )
-        register_password = st.text_input(
-            t["password_input"],
-            type="password",
-            key="register_password",
-        )
-        register_password_confirm = st.text_input(
-            t["confirm_password"],
-            type="password",
-            key="register_password_confirm",
-        )
+                if not authenticate_user(login_name, login_password):
+                    st.error(t["password_error"])
+                    st.stop()
 
-        if st.button(t["create_account"], use_container_width=True, key="register_button"):
-            if not register_name.strip():
-                st.error(t["name_error"])
-                st.stop()
+                st.session_state["language"] = language
+                st.session_state["user_name"] = login_name.strip()
+                st.session_state["authenticated"] = True
+                st.session_state["session_start"] = datetime.now()
+                st.session_state["assessment_completed"] = True
+                st.session_state["assessment_data"] = {
+                    "user_name": login_name.strip(),
+                    "language": language,
+                }
+                st.success(t["saved"])
+                st.rerun()
 
-            if len(register_password) < 6:
-                st.error(t["password_short"])
-                st.stop()
+        with register_tab:
+            register_name = st.text_input(
+                t["name_input"],
+                key="register_user_name_legacy",
+            )
+            register_password = st.text_input(
+                t["password_input"],
+                type="password",
+                key="register_password_legacy",
+            )
+            register_password_confirm = st.text_input(
+                t["confirm_password"],
+                type="password",
+                key="register_password_confirm_legacy",
+            )
 
-            if register_password != register_password_confirm:
-                st.error(t["password_mismatch"])
-                st.stop()
+            if st.button(t["create_account"], use_container_width=True, key="register_button_legacy"):
+                if not register_name.strip():
+                    st.error(t["name_error"])
+                    st.stop()
 
-            if not register_user(register_name, register_password):
-                st.error(t["user_exists"])
-                st.stop()
+                if len(register_password) < 6:
+                    st.error(t["password_short"])
+                    st.stop()
 
-            st.success(t["register_success"])
+                if register_password != register_password_confirm:
+                    st.error(t["password_mismatch"])
+                    st.stop()
+
+                if not register_user(register_name, register_password):
+                    st.error(t["user_exists"])
+                    st.stop()
+
+                st.success(t["register_success"])
 else:
     if st.button(t["logout"], use_container_width=True, key="main_logout"):
         st.session_state["confirm_logout"] = True
@@ -241,7 +353,21 @@ else:
         c1, c2 = st.columns(2)
         with c1:
             if st.button("Yes" if language == "English" else "确认", use_container_width=True, key="confirm_logout_yes"):
-                logout()
+                # Prefer API logout if available
+                if BACKEND_AVAILABLE and st.session_state.get("api_refresh_token"):
+                    try:
+                        auth = st.session_state.get("api_auth_client")
+                        if auth:
+                            auth.logout()
+                    except Exception:
+                        pass
+                st.session_state.pop("api_client", None)
+                st.session_state.pop("api_auth_client", None)
+                st.session_state.pop("access_token", None)
+                st.session_state.pop("refresh_token", None)
+                st.session_state.pop("api_user", None)
+                for key in ["authenticated", "password_verified", "assessment_completed"]:
+                    st.session_state.pop(key, None)
                 st.session_state["confirm_logout"] = False
                 st.rerun()
         with c2:

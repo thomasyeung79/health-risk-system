@@ -15,6 +15,7 @@ from app.services.report_engine.response_parser import parse_response
 
 def generate_report(
     db: Session,
+    user_id: int,
     language: str,
     style: str = "balanced",
     days: int = 7,
@@ -27,6 +28,7 @@ def generate_report(
     # 1. Check cache
     cached = get_cached_report(
         db=db,
+        user_id=user_id,
         language=language,
         style=style,
         provider=provider_obj.provider_name,
@@ -59,6 +61,7 @@ def generate_report(
     # 2. Build context
     context = build_context(
         db=db,
+        user_id=user_id,
         language=language,
         style=style,
         days=days,
@@ -92,6 +95,7 @@ def generate_report(
     # 6. Persist
     record = save_report(
         db=db,
+        user_id=user_id,
         language=language,
         style=style,
         provider=provider_obj.provider_name,

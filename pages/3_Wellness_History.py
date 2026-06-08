@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-from database import load_health_records, load_mind_records, load_json, filter_user
 from modules.ui import (
     apply_product_theme,
     require_auth,
@@ -11,6 +10,58 @@ from modules.ui import (
     render_section_label,
     render_topbar,
 )
+
+# ── Backend API data loading ────────────────────────
+BACKEND_AVAILABLE = False
+try:
+    from api_client.client import ApiClient
+    from api_client.health_client import HealthClient
+    from api_client.emotion_client import EmotionClient
+    from api_client.report_client import ReportClient
+    from api_client.trend_client import TrendClient
+
+    if "api_client" in st.session_state:
+        client = st.session_state["api_client"]
+    else:
+        client = ApiClient()
+        st.session_state["api_client"] = client
+
+    # Restore tokens if available
+    if st.session_state.get("access_token"):
+        client.set_tokens(
+            st.session_state["access_token"],
+            st.session_state.get("refresh_token", ""),
+        )
+
+    health_api = HealthClient(client)
+    emotion_api = EmotionClient(client)
+    report_api = ReportClient(client)
+    trend_api = TrendClient(client)
+    BACKEND_AVAILABLE = client.is_authenticated
+except Exception:
+    pass
+
+
+def load_health_records_api():
+    """Load health records from backend API."""
+    if not BACKEND_AVAILABLE:
+        return []
+    try:
+        result = health_api.list_records(limit=100, offset=0)
+        return result.get("items", [])
+    except Exception:
+        return []
+
+
+def load_emotion_records_api():
+    """Load emotion records from backend API."""
+    if not BACKEND_AVAILABLE:
+        return []
+    try:
+        result = emotion_api.list_records(limit=100, offset=0)
+        return result.get("items", [])
+    except Exception:
+        return []
 
 st.set_page_config(
     page_title="Wellness History",
@@ -84,14 +135,18 @@ if st.button(t["back"]):
     st.switch_page("web_v1.py")
 
 
-health_df = load_health_records()
-mind_df = load_mind_records()
+# ── Load data ───────────────────────────────────────
+if BACKEND_AVAILABLE:
+    health_records = load_health_records_api()
+    mind_records = load_emotion_records_api()
+else:
+    # Legacy fallback
+    from database import load_health_records, load_mind_records, filter_user
 
-health_records = health_df.to_dict("records")
-mind_records = mind_df.to_dict("records")
-
-health_records = filter_user(health_records, user_name)
-mind_records = filter_user(mind_records, user_name)
+    health_df = load_health_records()
+    mind_df = load_mind_records()
+    health_records = filter_user(health_df.to_dict("records"), user_name)
+    mind_records = filter_user(mind_df.to_dict("records"), user_name)
 
 st.divider()
 
@@ -110,15 +165,18 @@ with col1:
         health_rows = []
 
         for r in health_records:
-
-            result = r.get("result", r)
+            # Support both API format (flat) and legacy format (with "result" wrapper)
+            src = r.get("result", r) if isinstance(r, dict) else {}
 
             health_rows.append({
-                "created_at": r.get("created_at") if r.get("created_at") is not None else r.get("timestamp"),
-                "user": r.get("user_name") if r.get("user_name") is not None else r.get("username"),
-                "health_score": result.get("health_score") if result.get("health_score") is not None else result.get("overall_score"),
-                "risk_level": result.get("risk_level"),
-                "risk_percent": result.get("risk_percent")
+                "created_at": r.get("created_at") or r.get("timestamp", ""),
+                "health_score": (
+                    r.get("health_score")
+                    if r.get("health_score") is not None
+                    else src.get("health_score") or src.get("overall_score")
+                ),
+                "risk_level": r.get("risk_level") or src.get("risk_level"),
+                "risk_percent": r.get("risk_percent") or src.get("risk_percent"),
             })
 
         health_df = pd.DataFrame(health_rows)
@@ -163,16 +221,14 @@ with col2:
         mind_rows = []
 
         for r in mind_records:
-
+            # Map API format or legacy format to display columns
             mind_rows.append({
-                "created_at": r.get("created_at"),
-                "user": r.get("username") or r.get("user_name"),
-                "mood": r.get("mood"),
-                "event": r.get("event"),
+                "created_at": r.get("created_at", ""),
+                "mood": r.get("mood") or r.get("mood_key", ""),
+                "event": r.get("event") or r.get("event_key", ""),
                 "energy": r.get("energy"),
                 "stress": r.get("stress"),
-                "topic": r.get("topic"),
-                "summary": r.get("summary")
+                "topic": r.get("topic") or r.get("pattern_key", ""),
             })
 
         mind_df = pd.DataFrame(mind_rows)

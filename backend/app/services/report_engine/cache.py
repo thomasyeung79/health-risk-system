@@ -10,6 +10,7 @@ from app.models.report_record import ReportRecord
 
 def get_cached_report(
     db: Session,
+    user_id: int,
     language: str,
     style: str,
     provider: str,
@@ -20,6 +21,7 @@ def get_cached_report(
     record = (
         db.query(ReportRecord)
         .filter(
+            ReportRecord.user_id == user_id,
             ReportRecord.created_at >= today_start,
             ReportRecord.language == language,
             ReportRecord.style == style,
@@ -39,6 +41,7 @@ def get_cached_report(
 def save_report(
     db: Session,
     *,
+    user_id: int,
     language: str,
     style: str,
     provider: str,
@@ -55,6 +58,7 @@ def save_report(
 ) -> ReportRecord:
     """Persist a generated report to the database."""
     record = ReportRecord(
+        user_id=user_id,
         language=language,
         style=style,
         provider=provider,

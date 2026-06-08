@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.report_record import ReportRecord
+from app.models.user import User
+from app.services.auth import get_current_user
 from app.schemas.report import (
     GenerateReportRequest,
     GenerateReportResponse,
@@ -20,10 +22,15 @@ router = APIRouter(prefix="/api/v1/reports", tags=["reports"])
 
 
 @router.post("/generate", response_model=GenerateReportResponse)
-def post_generate_report(body: GenerateReportRequest, db: Session = Depends(get_db)):
+def post_generate_report(
+    body: GenerateReportRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Generate a wellness report from health + emotion data."""
     result = generate_report(
         db=db,
+        user_id=current_user.id,
         language=body.language,
         style=body.style,
         days=body.days,
@@ -54,9 +61,12 @@ def list_reports(
     limit: int = Query(default=10, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """List generated reports with pagination."""
-    query = db.query(ReportRecord).order_by(ReportRecord.created_at.desc())
+    query = db.query(ReportRecord).filter(
+        ReportRecord.user_id == current_user.id
+    ).order_by(ReportRecord.created_at.desc())
     total = query.count()
     records = query.offset(offset).limit(limit).all()
 
@@ -83,10 +93,14 @@ def list_reports(
 
 
 @router.get("/{report_id}", response_model=GenerateReportResponse)
-def get_report(report_id: int, db: Session = Depends(get_db)):
+def get_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get a single report by ID."""
     record = db.get(ReportRecord, report_id)
-    if record is None:
+    if record is None or record.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Report not found")
 
     import json

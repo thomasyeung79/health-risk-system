@@ -34,7 +34,7 @@ SAMPLE_INPUTS = {
 class TestHealthCheck:
     def test_full_health_check(self, db_session):
         """Verify run_health_check returns all expected fields."""
-        result = run_health_check(db_session, "English", **SAMPLE_INPUTS)
+        result = run_health_check(db_session, 1, "English", **SAMPLE_INPUTS)
 
         # Check response structure
         assert result["id"] == 1
@@ -60,7 +60,7 @@ class TestHealthCheck:
 
     def test_db_persisted(self, db_session):
         """Verify the record was saved to the database."""
-        result = run_health_check(db_session, "English", **SAMPLE_INPUTS)
+        result = run_health_check(db_session, 1, "English", **SAMPLE_INPUTS)
 
         record = db_session.get(HealthRecord, result["id"])
         assert record is not None
@@ -85,13 +85,14 @@ class TestHealthCheck:
             "risk_score_focus": "C",
             "risk_score_body": "C",
         }
-        result = run_health_check(db_session, "English", **high_risk)
+        result = run_health_check(db_session, 1, "English", **high_risk)
         assert result["risk_level"] in ("Medium Risk", "High Risk")
         assert result["health_score"] < 80
 
     def test_chinese_language(self, db_session):
         """Verify Chinese language output."""
-        result = run_health_check(db_session, "中文", **SAMPLE_INPUTS)
+        result = run_health_check(db_session, 1, "中文", **SAMPLE_INPUTS)
         assert result["risk_level"] == "健康"
         assert result["health_score"] == 100.0
+
 

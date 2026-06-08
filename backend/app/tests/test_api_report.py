@@ -1,4 +1,4 @@
-"""Integration tests for report API endpoints."""
+﻿"""Integration tests for report API endpoints."""
 
 from unittest.mock import patch
 
@@ -17,11 +17,12 @@ SAMPLE_PAYLOAD = {
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, auth_headers):
     def override_get_db():
         yield db_session
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
+        c.headers.update(auth_headers)
         yield c
     app.dependency_overrides.clear()
 
@@ -96,3 +97,4 @@ class TestGetReport:
     def test_get_nonexistent(self, client):
         resp = client.get("/api/v1/reports/9999")
         assert resp.status_code == 404
+

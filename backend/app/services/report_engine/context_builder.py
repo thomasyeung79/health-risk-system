@@ -15,6 +15,7 @@ from app.models.emotion_record import EmotionRecord
 
 def build_context(
     db: Session,
+    user_id: int,
     language: str,
     style: str = "balanced",
     days: int = 7,
@@ -51,6 +52,7 @@ def build_context(
     else:
         latest_health = (
             db.query(HealthRecord)
+            .filter(HealthRecord.user_id == user_id)
             .order_by(HealthRecord.created_at.desc())
             .first()
         )
@@ -60,6 +62,7 @@ def build_context(
     else:
         latest_emotion = (
             db.query(EmotionRecord)
+            .filter(EmotionRecord.user_id == user_id)
             .order_by(EmotionRecord.created_at.desc())
             .first()
         )
@@ -88,7 +91,10 @@ def build_context(
         cutoff = datetime.utcnow() - timedelta(days=days)
         recent_records = (
             db.query(HealthRecord)
-            .filter(HealthRecord.created_at >= cutoff)
+            .filter(
+                HealthRecord.user_id == user_id,
+                HealthRecord.created_at >= cutoff,
+            )
             .order_by(HealthRecord.created_at.asc())
             .all()
         )
@@ -120,7 +126,10 @@ def build_context(
         cutoff = datetime.utcnow() - timedelta(days=days)
         recent_emotions = (
             db.query(EmotionRecord)
-            .filter(EmotionRecord.created_at >= cutoff)
+            .filter(
+                EmotionRecord.user_id == user_id,
+                EmotionRecord.created_at >= cutoff,
+            )
             .order_by(EmotionRecord.created_at.asc())
             .all()
         )

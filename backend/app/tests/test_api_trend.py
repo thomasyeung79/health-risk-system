@@ -1,4 +1,4 @@
-"""Integration tests for trend analysis API."""
+﻿"""Integration tests for trend analysis API."""
 
 from datetime import datetime, timedelta
 
@@ -12,11 +12,12 @@ from app.models.emotion_record import EmotionRecord
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, auth_headers):
     def override_get_db():
         yield db_session
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
+        c.headers.update(auth_headers)
         yield c
     app.dependency_overrides.clear()
 
@@ -35,8 +36,8 @@ class TestTrendSummary:
 
     def test_with_health_data(self, client, db_session):
         dt = datetime.utcnow() - timedelta(days=5)
-        db_session.add(HealthRecord(created_at=dt, language="English", health_score=75.0, sleep_score=2))
-        db_session.add(HealthRecord(language="English", health_score=85.0, sleep_score=1))
+        db_session.add(HealthRecord(user_id=1, created_at=dt, language="English", health_score=75.0, sleep_score=2))
+        db_session.add(HealthRecord(user_id=1, language="English", health_score=85.0, sleep_score=1))
         db_session.flush()
 
         resp = client.get("/api/v1/trends/summary?days=7")
@@ -48,8 +49,8 @@ class TestTrendSummary:
 
     def test_with_emotion_data(self, client, db_session):
         dt = datetime.utcnow() - timedelta(days=3)
-        db_session.add(EmotionRecord(created_at=dt, language="English", stress=7, energy=4))
-        db_session.add(EmotionRecord(language="English", stress=4, energy=6))
+        db_session.add(EmotionRecord(user_id=1, created_at=dt, language="English", stress=7, energy=4))
+        db_session.add(EmotionRecord(user_id=1, language="English", stress=4, energy=6))
         db_session.flush()
 
         resp = client.get("/api/v1/trends/summary?days=7")
@@ -60,8 +61,8 @@ class TestTrendSummary:
         assert data["metrics"][2]["direction"] == "improving"
 
     def test_with_language_param(self, client, db_session):
-        db_session.add(HealthRecord(language="中文", health_score=80.0, sleep_score=1))
-        db_session.add(HealthRecord(language="中文", health_score=85.0, sleep_score=0))
+        db_session.add(HealthRecord(user_id=1, language="中文", health_score=80.0, sleep_score=1))
+        db_session.add(HealthRecord(user_id=1, language="中文", health_score=85.0, sleep_score=0))
         db_session.flush()
 
         resp = client.get("/api/v1/trends/summary?days=7&language=English")
@@ -76,3 +77,5 @@ class TestTrendSummary:
     def test_invalid_days(self, client):
         resp = client.get("/api/v1/trends/summary?days=0")
         assert resp.status_code == 422
+
+

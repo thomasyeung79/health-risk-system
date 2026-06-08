@@ -1,4 +1,4 @@
-"""Health check record ORM model."""
+﻿"""Health check record ORM model."""
 
 from datetime import datetime
 from typing import Optional
@@ -13,6 +13,8 @@ class HealthRecord(Base, TimestampMixin):
     """A single health check assessment record."""
 
     __tablename__ = "health_records"
+
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     # ── Primary key ─────────────────────────────────
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -73,3 +75,4 @@ class HealthRecord(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<HealthRecord id={self.id} score={self.health_score} level={self.risk_level}>"
+

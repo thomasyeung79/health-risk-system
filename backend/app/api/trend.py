@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models.user import User
+from app.services.auth import get_current_user
 from app.schemas.trend import MetricTrend, TrendSummaryResponse
 from app.services.trend_engine.trend_service import compute_summary
 
@@ -15,9 +17,10 @@ def get_trend_summary(
     days: int = Query(default=7, ge=1, le=90),
     language: str = Query(default="English"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get trend summary for core metrics over the given window."""
-    result = compute_summary(db=db, days=days, language=language)
+    result = compute_summary(db=db, user_id=current_user.id, days=days, language=language)
 
     return TrendSummaryResponse(
         days_analyzed=result["days_analyzed"],

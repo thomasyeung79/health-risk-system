@@ -1,4 +1,4 @@
-"""Emotion analysis record ORM model."""
+﻿"""Emotion analysis record ORM model."""
 
 from typing import Optional
 
@@ -12,6 +12,8 @@ class EmotionRecord(Base, TimestampMixin):
     """A single emotion analysis record."""
 
     __tablename__ = "emotion_records"
+
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     # ── Primary key ─────────────────────────────────
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -41,3 +43,4 @@ class EmotionRecord(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<EmotionRecord id={self.id} mood={self.mood_key} stress={self.stress}>"
+

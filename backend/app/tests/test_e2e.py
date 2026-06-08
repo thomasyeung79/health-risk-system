@@ -29,11 +29,12 @@ EMOTION_SAMPLE = {
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, auth_headers):
     def override_get_db():
         yield db_session
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
+        c.headers.update(auth_headers)
         yield c
     app.dependency_overrides.clear()
 

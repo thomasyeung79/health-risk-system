@@ -1,4 +1,4 @@
-"""Integration tests for emotion analysis API endpoints."""
+﻿"""Integration tests for emotion analysis API endpoints."""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,11 +17,12 @@ SAMPLE_PAYLOAD = {
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, auth_headers):
     def override_get_db():
         yield db_session
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
+        c.headers.update(auth_headers)
         yield c
     app.dependency_overrides.clear()
 
@@ -101,3 +102,4 @@ class TestStats:
         data = resp.json()
         assert data["total_records"] == 1
         assert data["latest_mood"] == "Calm"
+

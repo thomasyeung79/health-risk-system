@@ -69,7 +69,7 @@ def main():
         from fastapi.testclient import TestClient
 
         with TestClient(app) as client:
-            # GET /health
+            # GET /health (public)
             resp = client.get("/health")
             data = resp.json()
             if resp.status_code == 200 and data.get("status") == "ok":
@@ -78,8 +78,28 @@ def main():
                 print(f"  [FAIL] GET /health returned {resp.status_code}: {data}")
                 ok = False
 
-            # GET /api/v1/emotion/stats
-            resp = client.get("/api/v1/emotion/stats")
+            # Register + login to get token for protected endpoints
+            reg = client.post("/api/v1/auth/register", json={
+                "username": "check_user", "password": "check_pass",
+            })
+            if reg.status_code != 201:
+                # User may already exist
+                pass
+
+            login = client.post("/api/v1/auth/login", json={
+                "username": "check_user", "password": "check_pass",
+            })
+            if login.status_code == 200:
+                token = login.json()["access_token"]
+                auth_headers = {"Authorization": f"Bearer {token}"}
+                print("  [PASS] Auth: register + login")
+            else:
+                print("  [FAIL] Auth: unable to authenticate")
+                ok = False
+                auth_headers = {}
+
+            # GET /api/v1/emotion/stats (protected)
+            resp = client.get("/api/v1/emotion/stats", headers=auth_headers)
             if resp.status_code == 200:
                 data = resp.json()
                 print(f"  [PASS] GET /api/v1/emotion/stats (total_records={data['total_records']})")
@@ -87,7 +107,7 @@ def main():
                 print(f"  [FAIL] GET /api/v1/emotion/stats returned {resp.status_code}")
                 ok = False
 
-            # POST /api/v1/emotion/analyze
+            # POST /api/v1/emotion/analyze (protected)
             payload = {
                 "language": "English",
                 "mood_key": "Calm",
@@ -95,7 +115,7 @@ def main():
                 "energy": 7,
                 "stress": 3,
             }
-            resp = client.post("/api/v1/emotion/analyze", json=payload)
+            resp = client.post("/api/v1/emotion/analyze", json=payload, headers=auth_headers)
             if resp.status_code == 200:
                 data = resp.json()
                 has_keys = {"summary", "pattern", "breathing", "full_story"}.issubset(data.keys())
@@ -108,8 +128,8 @@ def main():
                 print(f"  [FAIL] POST /api/v1/emotion/analyze returned {resp.status_code}")
                 ok = False
 
-            # GET /api/v1/health/stats
-            resp = client.get("/api/v1/health/stats")
+            # GET /api/v1/health/stats (protected)
+            resp = client.get("/api/v1/health/stats", headers=auth_headers)
             if resp.status_code == 200:
                 print(f"  [PASS] GET /api/v1/health/stats")
             else:

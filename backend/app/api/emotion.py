@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.emotion_record import EmotionRecord
+from app.models.user import User
+from app.services.auth import get_current_user
 from app.schemas.emotion import (
     EmotionAnalyzeRequest,
     EmotionAnalyzeResponse,
@@ -23,10 +25,15 @@ router = APIRouter(prefix="/api/v1/emotion", tags=["emotion"])
 
 
 @router.post("/analyze", response_model=EmotionAnalyzeResponse)
-def post_emotion_analyze(body: EmotionAnalyzeRequest, db: Session = Depends(get_db)):
+def post_emotion_analyze(
+    body: EmotionAnalyzeRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Run emotion analysis and persist results."""
     result = analyze_emotion(
         db=db,
+        user_id=current_user.id,
         language=body.language,
         mood_key=body.mood_key,
         event_key=body.event_key,
@@ -54,9 +61,12 @@ def list_emotion_records(
     limit: int = Query(default=10, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """List emotion records with pagination."""
-    query = db.query(EmotionRecord).order_by(EmotionRecord.created_at.desc())
+    query = db.query(EmotionRecord).filter(
+        EmotionRecord.user_id == current_user.id
+    ).order_by(EmotionRecord.created_at.desc())
     total = query.count()
     records = query.offset(offset).limit(limit).all()
 
@@ -83,10 +93,14 @@ def list_emotion_records(
 
 
 @router.get("/records/{record_id}", response_model=EmotionRecordDetail)
-def get_emotion_record(record_id: int, db: Session = Depends(get_db)):
+def get_emotion_record(
+    record_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get a single emotion record by ID."""
     record = db.get(EmotionRecord, record_id)
-    if record is None:
+    if record is None or record.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Record not found")
 
     return EmotionRecordDetail(
@@ -109,15 +123,19 @@ def get_emotion_record(record_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/stats", response_model=EmotionStatsResponse)
-def get_emotion_stats(db: Session = Depends(get_db)):
+def get_emotion_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get aggregated emotion statistics."""
-    total = db.query(EmotionRecord).count()
+    base = db.query(EmotionRecord).filter(EmotionRecord.user_id == current_user.id)
+    total = base.count()
 
-    avg_energy = db.query(func.avg(EmotionRecord.energy)).scalar()
-    avg_stress = db.query(func.avg(EmotionRecord.stress)).scalar()
+    avg_energy = base.with_entities(func.avg(EmotionRecord.energy)).scalar()
+    avg_stress = base.with_entities(func.avg(EmotionRecord.stress)).scalar()
 
     latest = (
-        db.query(EmotionRecord.mood_key)
+        base.with_entities(EmotionRecord.mood_key)
         .order_by(EmotionRecord.created_at.desc())
         .first()
     )

@@ -1,4 +1,4 @@
-"""Report record ORM model — caches AI-generated wellness reports."""
+﻿"""Report record ORM model — caches AI-generated wellness reports."""
 
 from typing import Optional
 
@@ -12,6 +12,8 @@ class ReportRecord(Base, TimestampMixin):
     """A cached AI-generated wellness report."""
 
     __tablename__ = "report_records"
+
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     language: Mapped[str] = mapped_column(String(10), nullable=False, default="English")
@@ -36,3 +38,4 @@ class ReportRecord(Base, TimestampMixin):
     latency_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     is_cached: Mapped[bool] = mapped_column(Boolean, default=False)
     is_fallback: Mapped[bool] = mapped_column(Boolean, default=False)
+
