@@ -144,7 +144,10 @@ t = TEXT[language]
 BACKEND_AVAILABLE = False
 try:
     from api_client.client import ApiClient
+    from api_client.health_client import HealthClient
+    from api_client.emotion_client import EmotionClient
     from api_client.report_client import ReportClient
+    from api_client.trend_client import TrendClient
 
     if "api_client" in st.session_state:
         _client = st.session_state["api_client"]
@@ -161,7 +164,10 @@ try:
     _health = _client.get("/health")
     if _health.get("status") == "ok" and _client.is_authenticated:
         BACKEND_AVAILABLE = True
+        health_api = HealthClient(_client)
+        emotion_api = EmotionClient(_client)
         report_api = ReportClient(_client)
+        trend_api = TrendClient(_client)
 except Exception:
     pass
 
@@ -511,32 +517,74 @@ Physical health, stress, sleep, movement, and screen habits usually influence ea
 3. If stress or physical symptoms persist, talk to someone you trust or seek professional support.
 """
 
-health_records = load_json(HEALTH_JSON)
-mind_records = load_json(MIND_JSON)
+# ── API data adapters ─────────────────────────────
+def _api_records_to_health_records(api_items):
+    """Convert API health records to legacy format."""
+    result = []
+    for item in api_items:
+        result.append({
+            "created_at": item.get("created_at", ""),
+            "health_score": item.get("health_score"),
+            "risk_level": item.get("risk_level"),
+            "risk_percent": item.get("risk_percent"),
+            "bmi_score": item.get("bmi_score"),
+            "water_score": item.get("water_score"),
+            "sleep_score": item.get("sleep_score"),
+            "activity_score": item.get("activity_score"),
+            "diet_score": item.get("diet_score"),
+            "mental_score": item.get("mental_score"),
+            "screen_score": item.get("screen_score"),
+            "habit_score": item.get("habit_score"),
+        })
+    return result
 
-health_records = filter_user(
-    health_records,
-    user_name
-)
 
-mind_records = filter_user(
-    mind_records,
-    user_name
-)
+def _api_records_to_mind_records(api_items):
+    """Convert API emotion records to legacy format. Maps mood_key -> mood."""
+    result = []
+    for item in api_items:
+        result.append({
+            "created_at": item.get("created_at", ""),
+            "mood": item.get("mood_key", ""),
+            "mood_key": item.get("mood_key", ""),
+            "event": item.get("event_key", ""),
+            "event_key": item.get("event_key", ""),
+            "energy": item.get("energy"),
+            "stress": item.get("stress"),
+            "topic": item.get("pattern_key", ""),
+            "pattern_key": item.get("pattern_key", ""),
+            "summary": item.get("summary", ""),
+        })
+    return result
 
-latest_health = get_latest_health(
-    health_records
-)
 
-latest_mind = get_latest_mind(
-    mind_records
-)
+# ── Load data: API first, JSON fallback ───────────
+_api_health_data = None
+_api_mind_data = None
 
-history_summary = build_history_summary(
-    health_records,
-    mind_records,
-    language
-)
+if BACKEND_AVAILABLE:
+    try:
+        _api_health_data = health_api.list_records(limit=100).get("items", [])
+        _api_mind_data = emotion_api.list_records(limit=100).get("items", [])
+    except Exception:
+        pass
+
+if _api_health_data is not None:
+    health_records = _api_records_to_health_records(_api_health_data)
+else:
+    health_records = load_json(HEALTH_JSON)
+    health_records = filter_user(health_records, user_name)
+
+if _api_mind_data is not None:
+    mind_records = _api_records_to_mind_records(_api_mind_data)
+else:
+    mind_records = load_json(MIND_JSON)
+    mind_records = filter_user(mind_records, user_name)
+
+latest_health = get_latest_health(health_records)
+latest_mind = get_latest_mind(mind_records)
+
+history_summary = build_history_summary(health_records, mind_records, language)
 
 st.divider()
 
