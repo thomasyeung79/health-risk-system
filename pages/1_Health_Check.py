@@ -11,6 +11,7 @@ from modules.diet import calc_diet
 from modules.mental_healthy import calc_mental_healthy
 from modules.screen_time import calc_screen_time
 from modules.habit import calc_habit
+
 from modules.ui import (
     apply_product_theme,
     require_auth,
@@ -22,6 +23,30 @@ from modules.ui import (
     render_topbar,
 )
 
+# ── Backend API availability ───────────────────────
+BACKEND_AVAILABLE = False
+try:
+    from api_client.client import ApiClient
+    from api_client.health_client import HealthClient
+
+    if "api_client" in st.session_state:
+        _client = st.session_state["api_client"]
+    else:
+        _client = ApiClient()
+        st.session_state["api_client"] = _client
+
+    if st.session_state.get("access_token"):
+        _client.set_tokens(
+            st.session_state["access_token"],
+            st.session_state.get("refresh_token", ""),
+        )
+
+    _health = _client.get("/health")
+    if _health.get("status") == "ok" and _client.is_authenticated:
+        BACKEND_AVAILABLE = True
+        health_api = HealthClient(_client)
+except Exception:
+    pass
 
 st.set_page_config(
     page_title="Health Check",
@@ -160,9 +185,9 @@ TEXT = {
         "footer": "AI健康平台 | 健康模块",
 
         "healthy": "健康",
-            "低风险": t["low_risk"],
-            "中风险": t["medium_risk"],
-            "高风险": t["high_risk"],
+        "low_risk": "低风险",
+        "medium_risk": "中风险",
+        "high_risk": "高风险",
 
         "bmi_module": "BMI",
         "water_module": "饮水",
@@ -351,7 +376,6 @@ with col2:
         "中文": "1份 ≈ 1个中等水果或半杯蔬菜。"
     }[language])
 
-    fast_food_times
     fast_food_times = st.slider(
         t["fast_food"],
         0,
@@ -363,7 +387,6 @@ with col2:
         "中文": "包括：汉堡、炸鸡、披萨、方便食品、外卖等。"
     }[language])
 
-    sugary_drinks
     sugary_drinks = st.slider(
         t["sugary_drinks"],
         0,
@@ -375,7 +398,6 @@ with col2:
         "中文": "包括：汽水、奶茶、能量饮料、含糖果汁等。"
     }[language])
 
-    screen_time_hours
     screen_time_hours = st.slider(
         t["screen_time"],
         0.0,
@@ -419,80 +441,79 @@ with col2:
         format_func=lambda x: BODY_MAP[language][x]
     )
 
+def _adapt_api_response(api_result):
+    """Convert API response to the format expected by the display code below."""
+    modules_list = []
+    for name, data in api_result.get("modules", {}).items():
+        modules_list.append({
+            "name": name,
+            "score": data["score"],
+            "level": data["level"],
+            "max_score": 3,
+            "reasons": data.get("reasons", []),
+            "suggestions": data.get("suggestions", []),
+        })
+    overall_result = {
+        "health_score": api_result["health_score"],
+        "risk_percent": api_result["risk_percent"],
+        "risk_level": api_result["risk_level"],
+        "risk_score": sum(m["score"] for m in modules_list),
+        "max_risk_score": len(modules_list) * 3,
+        "interaction_score": 0,
+        "interaction_notes": [],
+        "overall": api_result.get("overall", ""),
+        "primary_focus": api_result.get("primary_focus", ""),
+        "action_plan": api_result.get("action_plan", []),
+    }
+    return modules_list, overall_result
+
+
 if st.button(t["generate"], use_container_width=True):
 
     with st.spinner(t["loading"]):
 
-        bmi_result = calc_bmi(
-            weight_kg,
-            height_cm,
-            language
-        )
+        api_success = False
+        if BACKEND_AVAILABLE:
+            try:
+                payload = {
+                    "language": language,
+                    "weight_kg": weight_kg, "height_cm": height_cm, "water_l": water_l,
+                    "situation": situation, "thirst_level": thirst_level, "urine_color": urine_color,
+                    "sleep_hours": sleep_hours, "night_wake_times": night_wake_times,
+                    "difficulty_falling_asleep": difficulty_falling_asleep,
+                    "irregular_sleep_schedule": irregular_sleep_schedule,
+                    "exercise_minutes": exercise_minutes, "sedentary_hours": sedentary_hours,
+                    "fruit_veg_servings": fruit_veg_servings, "fast_food_times": fast_food_times,
+                    "sugary_drinks": sugary_drinks, "screen_time_hours": screen_time_hours,
+                    "smoking": smoking, "alcohol": alcohol, "late_night": late_night,
+                    "risk_score_emotion": risk_score_emotion,
+                    "risk_score_focus": risk_score_focus,
+                    "risk_score_body": risk_score_body,
+                }
+                api_result = health_api.check(**payload)
+                results, overall_result = _adapt_api_response(api_result)
+                api_success = True
+            except Exception:
+                st.warning("Backend API unavailable, using local analysis."
+                           if language == "English" else "后端 API 不可用，使用本地分析。")
 
-        water_result = calc_water_ratio(
-            water_l,
-            situation,
-            weight_kg,
-            thirst_level,
-            urine_color,
-            language
-        )
+        if not api_success:
+            # Legacy fallback: run 8 engines locally
+            bmi_result = calc_bmi(weight_kg, height_cm, language)
+            water_result = calc_water_ratio(water_l, situation, weight_kg, thirst_level, urine_color, language)
+            sleep_result = calc_sleep(sleep_hours, night_wake_times, difficulty_falling_asleep, irregular_sleep_schedule, language)
+            activity_result = calc_activity(exercise_minutes, sedentary_hours, language)
+            diet_result = calc_diet(fruit_veg_servings, fast_food_times, sugary_drinks, language)
+            mental_result = calc_mental_healthy(risk_score_emotion, risk_score_focus, risk_score_body, language)
+            screen_result = calc_screen_time(screen_time_hours, language)
+            habit_result = calc_habit(smoking, alcohol, late_night, language)
 
-        sleep_result = calc_sleep(
-            sleep_hours,
-            night_wake_times,
-            difficulty_falling_asleep,
-            irregular_sleep_schedule,
-            language
-        )
+            results = [
+                bmi_result, water_result, sleep_result, activity_result,
+                diet_result, mental_result, screen_result, habit_result,
+            ]
 
-        activity_result = calc_activity(
-            exercise_minutes,
-            sedentary_hours,
-            language
-        )
-
-        diet_result = calc_diet(
-            fruit_veg_servings,
-            fast_food_times,
-            sugary_drinks,
-            language
-        )
-
-        mental_result = calc_mental_healthy(
-            risk_score_emotion,
-            risk_score_focus,
-            risk_score_body,
-            language
-        )
-
-        screen_result = calc_screen_time(
-            screen_time_hours,
-            language
-        )
-
-        habit_result = calc_habit(
-            smoking,
-            alcohol,
-            late_night,
-            language
-        )
-
-        results = [
-            bmi_result,
-            water_result,
-            sleep_result,
-            activity_result,
-            diet_result,
-            mental_result,
-            screen_result,
-            habit_result
-        ]
-
-        overall_result = calculate_overall_result(
-            results,
-            language
-        )
+            overall_result = calculate_overall_result(results, language)
 
         overall_score = overall_result["health_score"]
         risk_percent = overall_result["risk_percent"]
@@ -665,7 +686,8 @@ if st.button(t["generate"], use_container_width=True):
             "habit_score": habit_result["score"],
         }
 
-        save_health_json(record)
+        if not api_success:
+            save_health_json(record)
 
 st.divider()
 
