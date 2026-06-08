@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Optional
 
 import requests
@@ -23,7 +24,9 @@ class ApiClient:
     and raises ApiError for non-success responses.
     """
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = ""):
+        if not base_url:
+            base_url = os.environ.get("API_BASE_URL", "http://localhost:8000")
         self.base_url = base_url.rstrip("/")
         self._session = requests.Session()
         self._access_token: Optional[str] = None
