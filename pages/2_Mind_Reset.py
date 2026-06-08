@@ -14,6 +14,31 @@ from modules.ui import (
     render_topbar,
 )
 
+# ── Backend API availability ───────────────────────
+BACKEND_AVAILABLE = False
+try:
+    from api_client.client import ApiClient
+    from api_client.emotion_client import EmotionClient
+
+    if "api_client" in st.session_state:
+        _client = st.session_state["api_client"]
+    else:
+        _client = ApiClient()
+        st.session_state["api_client"] = _client
+
+    if st.session_state.get("access_token"):
+        _client.set_tokens(
+            st.session_state["access_token"],
+            st.session_state.get("refresh_token", ""),
+        )
+
+    _health = _client.get("/health")
+    if _health.get("status") == "ok" and _client.is_authenticated:
+        BACKEND_AVAILABLE = True
+        emotion_api = EmotionClient(_client)
+except Exception:
+    pass
+
 
 st.set_page_config(
     page_title="Mind Reset",
@@ -205,17 +230,45 @@ with col2:
 
 st.divider()
 
+def _adapt_emotion_api_response(api_result):
+    """Minimal adapter: API uses full_story, legacy UI expects story."""
+    api_result["story"] = api_result.pop("full_story")
+    return api_result
+
+
 if st.button(t["generate"], use_container_width=True):
 
     with st.spinner(t["loading"]):
 
-        result = run_reflection_engine(
-            clean_mood=[mood_key],
-            clean_things=[event_key],
-            stress_level=stress,
-            energy_level=energy,
-            language=language
-        )
+        api_success = False
+        result = None
+
+        if BACKEND_AVAILABLE:
+            try:
+                api_raw = emotion_api.analyze(
+                    language=language,
+                    mood_key=mood_key,
+                    event_key=event_key,
+                    energy=energy,
+                    stress=stress,
+                )
+                result = _adapt_emotion_api_response(api_raw)
+                api_success = True
+            except Exception:
+                st.warning(
+                    "Backend API unavailable, using local analysis."
+                    if language == "English"
+                    else "后端 API 不可用，使用本地分析。"
+                )
+
+        if not api_success:
+            result = run_reflection_engine(
+                clean_mood=[mood_key],
+                clean_things=[event_key],
+                stress_level=stress,
+                energy_level=energy,
+                language=language,
+            )
 
     mood_display = MOOD_LABELS[language][mood_key]
     event_display = EVENT_LABELS[language][event_key]
@@ -244,7 +297,8 @@ if st.button(t["generate"], use_container_width=True):
         "story": result["story"]
     }
 
-    save_mind_record(record)
+    if not api_success:
+        save_mind_record(record)
 
     st.success(t["saved"])
 
