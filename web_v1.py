@@ -28,6 +28,9 @@ try:
         if _health.get("status") == "ok":
             BACKEND_AVAILABLE = True
     else:
+        # Restore api_auth_client from existing api_client on page reload
+        if "api_auth_client" not in st.session_state:
+            st.session_state["api_auth_client"] = ApiAuthClient(st.session_state["api_client"])
         BACKEND_AVAILABLE = True
 except Exception:
     # Backend not available — will use legacy mode

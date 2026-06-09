@@ -52,6 +52,7 @@ TEXT = {
         "history": "History",
         "final_report": "Final Report",
         "go": "Go",
+        "logout": "Log out",
         "footer": "WellNest AI | Dashboard",
     },
     "中文": {
@@ -89,6 +90,7 @@ TEXT = {
         "history": "历史记录",
         "final_report": "综合报告",
         "go": "进入",
+        "logout": "退出登录",
         "footer": "WellNest AI | 看板",
     },
 }
@@ -98,6 +100,26 @@ if not language:
 t = TEXT.get(language, TEXT["English"])
 
 render_topbar(language, user_name)
+
+# ── Logout button ─────────────────────────────────
+lc1, lc2 = st.columns([6, 1])
+with lc2:
+    if st.button(f"{'🚪 Logout' if language == 'English' else '🚪 退出登录'}", use_container_width=True, key="dash_logout"):
+        st.session_state["confirm_dash_logout"] = True
+
+if st.session_state.get("confirm_dash_logout"):
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("Yes, log out" if language == "English" else "确认退出", use_container_width=True, key="dash_logout_yes"):
+            # Safely clear session state keys
+            for key in ["access_token", "refresh_token", "api_user", "user_name", "authenticated"]:
+                st.session_state.pop(key, None)
+            st.session_state["confirm_dash_logout"] = False
+            st.switch_page("web_v1.py")
+    with c2:
+        if st.button("Cancel" if language == "English" else "取消", use_container_width=True, key="dash_logout_no"):
+            st.session_state["confirm_dash_logout"] = False
+            st.rerun()
 
 # ── API client init ────────────────────────────────
 BACKEND_AVAILABLE = False

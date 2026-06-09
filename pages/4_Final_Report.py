@@ -869,6 +869,11 @@ else:
                     )
                     report = _api_report_to_markdown(api_result)
                     api_success = True
+                    # Detect LocalProvider "no_data" response and fall through
+                    # to generate_local_report() which uses locally-loaded data.
+                    summary_text = api_result.get("report", {}).get("summary", "") or ""
+                    if "not enough" in summary_text.lower() or "没有足够的" in summary_text:
+                        api_success = False
                 except Exception:
                     st.warning(
                         "Backend report API unavailable, using local fallback."
