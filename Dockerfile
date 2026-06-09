@@ -6,7 +6,11 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    fontconfig \
+    fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
+
+ENV MPLCONFIGDIR=/tmp/matplotlib
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

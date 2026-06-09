@@ -18,10 +18,10 @@ from modules.ui import (
     render_topbar,
 )
 
+matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = [
-    "Microsoft YaHei",
-    "SimHei",
-    "Arial Unicode MS"
+    "Noto Sans CJK JP",
+    "DejaVu Sans",
 ]
 matplotlib.rcParams["axes.unicode_minus"] = False
 
@@ -83,6 +83,10 @@ TEXT = {
 
         "insight_title": "AI Final Wellness Insight",
 
+        "radar_title": "Wellness Radar",
+
+        "radar_labels": ["BMI", "Water", "Sleep", "Activity", "Diet", "Mental", "Screen", "Habit"],
+
         "back": "Back to Home",
 
         "footer": "AI Wellness Platform | Final Report Module"
@@ -131,6 +135,10 @@ TEXT = {
         "no_mind": "暂无情绪记录。",
 
         "insight_title": "AI综合健康分析",
+
+        "radar_title": "综合健康雷达图",
+
+        "radar_labels": ["BMI", "饮水", "睡眠", "运动", "饮食", "心理", "屏幕", "习惯"],
 
         "back": "返回首页",
 
@@ -727,22 +735,9 @@ st.divider()
 
 if latest_health:
 
-    render_section_label(
-        "Wellness Radar"
-        if language == "English"
-        else "综合健康雷达图"
-    )
+    render_section_label(t["radar_title"])
 
-    labels = [
-        "BMI",
-        "Water",
-        "Sleep",
-        "Activity",
-        "Diet",
-        "Mental",
-        "Screen",
-        "Habit"
-    ]
+    labels = t["radar_labels"]
 
     values = [
         latest_health.get("bmi_score", 0),
@@ -756,7 +751,8 @@ if latest_health:
     ]
 
     # Invert: risk 0 = outer (healthy, value 3.0), risk 3 = inner (value 1.5)
-    values = [max(0.5, 3.0 - (v * 0.5)) for v in values]
+    values = [0 if v is None else v for v in values]
+    values = [max(0.5, 3.0 - (float(v) * 0.5)) for v in values]
 
     angles = np.linspace(
         0,
@@ -802,20 +798,7 @@ if latest_health:
     )
 
     ax.set_xticks(angles[:-1])
-
-    if language == "English":
-        ax.set_xticklabels(labels)
-    else:
-        ax.set_xticklabels([
-            "BMI",
-            "饮水",
-            "睡眠",
-            "运动",
-            "饮食",
-            "心理",
-            "屏幕",
-            "习惯"
-        ])
+    ax.set_xticklabels(labels)
 
     ax.set_ylim(0, 3)
 

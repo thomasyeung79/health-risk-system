@@ -663,30 +663,30 @@ if st.button(t["generate"], use_container_width=True):
                 for suggestion in r["suggestions"]:
                     st.write("-", suggestion)
 
-        record = {
-            "user_name": user_name,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "health_score": overall_score,
-            "risk_percent": risk_percent,
-            "risk_level": overall_level,
-            "risk_score": overall_result["risk_score"],
-            "max_risk_score": overall_result["max_risk_score"],
-            "interaction_score": interaction_score,
-            "interaction_notes": interaction_notes,
-            "summary": overall_summary,
-            "primary_focus": primary_focus,
-            "action_plan": action_plan,
-            "bmi_score": bmi_result["score"],
-            "water_score": water_result["score"],
-            "sleep_score": sleep_result["score"],
-            "activity_score": activity_result["score"],
-            "diet_score": diet_result["score"],
-            "mental_score": mental_result["score"],
-            "screen_score": screen_result["score"],
-            "habit_score": habit_result["score"],
-        }
-
         if not api_success:
+            record = {
+                "user_name": user_name,
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "health_score": overall_score,
+                "risk_percent": risk_percent,
+                "risk_level": overall_level,
+                "risk_score": overall_result["risk_score"],
+                "max_risk_score": overall_result["max_risk_score"],
+                "interaction_score": interaction_score,
+                "interaction_notes": interaction_notes,
+                "summary": overall_summary,
+                "primary_focus": primary_focus,
+                "action_plan": action_plan,
+                "bmi_score": bmi_result["score"],
+                "water_score": water_result["score"],
+                "sleep_score": sleep_result["score"],
+                "activity_score": activity_result["score"],
+                "diet_score": diet_result["score"],
+                "mental_score": mental_result["score"],
+                "screen_score": screen_result["score"],
+                "habit_score": habit_result["score"],
+           }
+
             save_health_json(record)
 
 st.divider()
