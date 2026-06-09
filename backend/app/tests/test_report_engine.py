@@ -65,9 +65,25 @@ class TestProvider:
             p = create_provider()
             assert p.provider_name == "deepseek"
 
-    def test_local_output(self):
+    def test_local_output_old_format(self):
         p = LocalProvider()
         r = p.generate("system", "health_score: 85, risk_level: Low Risk")
+        assert len(r) > 0
+
+    def test_local_output_english_rendered(self):
+        """Rendered English prompt format (how ContextBuilder actually outputs it)."""
+        p = LocalProvider()
+        ctx = "Generate a comprehensive wellness report based on this data:\n\nHealth Score: 85.0/100\nRisk Level: Low Risk\nModule Scores:\n  - BMI: 0/3\n  - Sleep: 1/3"
+        r = p.generate("system", ctx)
+        assert "not enough" not in r.lower()
+        assert len(r) > 0
+
+    def test_local_output_chinese_rendered(self):
+        """Rendered Chinese prompt format."""
+        p = LocalProvider()
+        ctx = "请基于以下健康数据生成综合报告：\n\n健康评分: 85/100\n风险等级: 低风险\n模块评分:\n  - BMI: 0/3\n  - 睡眠: 1/3"
+        r = p.generate("system", ctx)
+        assert "没有足够的" not in r
         assert len(r) > 0
 
     def test_local_no_data(self):

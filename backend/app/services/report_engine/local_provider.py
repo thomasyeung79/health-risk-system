@@ -83,7 +83,17 @@ class LocalProvider(LLMProvider):
             lang = "中文"
 
         # Determine risk level from context
-        has_data = "health_score" in context or "health_record" in context
+        # Check for rendered patterns that appear in the prompt text
+        # (not Python variable names, which don't appear in rendered output)
+        context_lower = context.lower()
+        has_data = any(
+            marker in context_lower
+            for marker in [
+                "health score", "health_score", "risk level", "risk_level",
+                "mood:", "stress:", "module score",
+                "健康评分", "风险等级", "情绪:", "模块评分",
+            ]
+        )
         if not has_data:
             return _LOCAL_TEMPLATES[lang]["no_data"]
 
