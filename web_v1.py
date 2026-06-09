@@ -49,6 +49,10 @@ st.set_page_config(
 
 apply_product_theme()
 
+# Redirect authenticated users to dashboard
+if st.session_state.get("authenticated"):
+    st.switch_page("pages/0_Dashboard.py")
+
 TEXT = {
     "English": {
         "title": "WellNest AI",
