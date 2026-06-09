@@ -56,6 +56,28 @@
 
 ---
 
+## Deployment
+
+See the [Deployment Guide](docs/deployment.md) for step-by-step instructions to deploy to a production VPS.
+
+| Environment | Status | URL |
+|-------------|--------|-----|
+| **Production** | ⏳ Planned | `https://wellness.thomasyeung.dev` |
+| **API** | ⏳ Planned | `https://api.wellness.thomasyeung.dev` |
+| **Staging** | 🟢 Local | `http://localhost:8501` |
+
+---
+
+## Screenshots
+
+![Login](docs/screenshots/01-login.png)
+![Health Check](docs/screenshots/02-health-check.png)
+![Emotion Analysis](docs/screenshots/03-emotion-analysis.png)
+![Final Report](docs/screenshots/04-final-report.png)
+![Trend Analysis](docs/screenshots/05-trend-analysis.png)
+
+---
+
 ## Feature Matrix
 
 | Category | Feature | Status | Notes |

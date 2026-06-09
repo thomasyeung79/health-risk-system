@@ -1,0 +1,38 @@
+services:
+  backend:
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env.production
+    environment:
+      - DATABASE_URL=sqlite:///./data/ai_wellness.db
+
+  frontend:
+    ports:
+      - "127.0.0.1:8501:8501"
+    env_file:
+      - .env.production
+    environment:
+      - API_BASE_URL=http://backend:8000
+
+  nginx:
+    image: nginx:alpine
+    container_name: ai-wellness-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot
+    depends_on:
+      - frontend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  sqlite_data:
