@@ -70,6 +70,10 @@ TEXT = {
         "history_desc": "View saved health and emotional records over time.",
         "report_title": "Final Wellness Report",
         "report_desc": "Generate a combined physical and emotional wellness summary.",
+        "dashboard_title": "Dashboard",
+        "dashboard_desc": "View your personalised wellness dashboard.",
+        "coach_title": "AI Coach",
+        "coach_desc": "Chat with your AI wellness coach.",
         "open": "Open",
         "footer": "WellNest AI | Product demo v3.0",
         "name_input": "User name",
@@ -117,6 +121,10 @@ TEXT = {
         "history_desc": "查看健康与情绪记录的长期变化。",
         "report_title": "综合报告",
         "report_desc": "生成身体健康与情绪状态的综合 AI 报告。",
+        "dashboard_title": "看板",
+        "dashboard_desc": "查看个性化健康看板。",
+        "coach_title": "AI 教练",
+        "coach_desc": "与 AI 健康教练对话。",
         "open": "进入",
         "footer": "WellNest AI | 产品演示 v3.0",
         "name_input": "用户姓名",
@@ -429,20 +437,18 @@ with col4:
 col5, col6 = st.columns(2)
 
 with col5:
-    render_module_card("DB", "Dashboard" if language == "English" else "看板",
-                       "View your personalised wellness dashboard." if language == "English" else "查看个性化健康看板。")
+    render_module_card("DB", t["dashboard_title"], t["dashboard_desc"])
 
-    if st.button("Open Dashboard" if language == "English" else "打开看板", use_container_width=True):
+    if st.button(f"{t['open']} {t['dashboard_title']}", use_container_width=True):
         if is_authenticated():
             st.switch_page("pages/0_Dashboard.py")
         else:
             st.warning(t["locked"])
 
 with col6:
-    render_module_card("AI", "AI Coach" if language == "English" else "AI 教练",
-                       "Chat with your AI wellness coach." if language == "English" else "与 AI 健康教练对话。")
+    render_module_card("AI", t["coach_title"], t["coach_desc"])
 
-    if st.button("Open AI Coach" if language == "English" else "打开 AI 教练", use_container_width=True):
+    if st.button(f"{t['open']} {t['coach_title']}", use_container_width=True):
         if is_authenticated():
             st.switch_page("pages/5_AI_Coach.py")
         else:

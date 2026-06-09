@@ -223,9 +223,14 @@ if q_input:
 
 if msgs:
     st.divider()
-    if st.button(f"🗑️ {t['clear']}", use_container_width=False):
-        st.session_state.coach_msgs = []
-        st.rerun()
+    c1, c2, _ = st.columns([1, 1, 2])
+    with c1:
+        if st.button(f"🗑️ {t['clear']}", use_container_width=False):
+            st.session_state.coach_msgs = []
+            st.rerun()
+    with c2:
+        if st.button("🏠 Back to Dashboard" if language == "English" else "🏠 返回看板", use_container_width=True):
+            st.switch_page("pages/0_Dashboard.py")
 
 st.divider()
 st.caption(t["footer"])

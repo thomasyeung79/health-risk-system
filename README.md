@@ -75,6 +75,8 @@ See the [Deployment Guide](docs/deployment.md) for step-by-step instructions to 
 ![Emotion Analysis](docs/screenshots/03-emotion-analysis.png)
 ![Final Report](docs/screenshots/04-final-report.png)
 ![Trend Analysis](docs/screenshots/05-trend-analysis.png)
+![Dashboard](docs/screenshots/06-dashboard.png)
+![AI Coach](docs/screenshots/07-ai-coach.png)
 
 ---
 
