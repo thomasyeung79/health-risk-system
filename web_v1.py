@@ -423,6 +423,28 @@ with col4:
         else:
             st.warning(t["locked"])
 
+col5, col6 = st.columns(2)
+
+with col5:
+    render_module_card("DB", "Dashboard" if language == "English" else "看板",
+                       "View your personalised wellness dashboard." if language == "English" else "查看个性化健康看板。")
+
+    if st.button("Open Dashboard" if language == "English" else "打开看板", use_container_width=True):
+        if is_authenticated():
+            st.switch_page("pages/0_Dashboard.py")
+        else:
+            st.warning(t["locked"])
+
+with col6:
+    render_module_card("AI", "AI Coach" if language == "English" else "AI 教练",
+                       "Chat with your AI wellness coach." if language == "English" else "与 AI 健康教练对话。")
+
+    if st.button("Open AI Coach" if language == "English" else "打开 AI 教练", use_container_width=True):
+        if is_authenticated():
+            st.switch_page("pages/5_AI_Coach.py")
+        else:
+            st.warning(t["locked"])
+
 st.divider()
 
 st.caption(t["footer"])

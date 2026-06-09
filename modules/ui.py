@@ -20,6 +20,8 @@ BRAND_NAME = {
 NAV_ITEMS = {
     "English": [
         ("Home", "web_v1.py"),
+        ("Dashboard", "pages/0_Dashboard.py"),
+        ("AI Coach", "pages/5_AI_Coach.py"),
         ("Health Check", "pages/1_Health_Check.py"),
         ("Mind Reset", "pages/2_Mind_Reset.py"),
         ("History", "pages/3_Wellness_History.py"),
@@ -27,6 +29,8 @@ NAV_ITEMS = {
     ],
     "中文": [
         ("首页", "web_v1.py"),
+        ("看板", "pages/0_Dashboard.py"),
+        ("AI 教练", "pages/5_AI_Coach.py"),
         ("健康检测", "pages/1_Health_Check.py"),
         ("情绪重整", "pages/2_Mind_Reset.py"),
         ("历史记录", "pages/3_Wellness_History.py"),
