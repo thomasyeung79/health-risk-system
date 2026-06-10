@@ -4,6 +4,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from modules.dashboard_insights import build_trend_insights
 from modules.ui import (
     apply_product_theme,
     render_section_label,
@@ -42,6 +43,8 @@ TEXT = {
         "trend_health": "Health",
         "trend_stress": "Stress",
         "trend_energy": "Energy",
+        "key_insights": "Key Insights",
+        "no_insights": "Complete more assessments to unlock personalised insights.",
         "improving": "Improving",
         "stable": "Stable",
         "declining": "Declining",
@@ -80,6 +83,8 @@ TEXT = {
         "trend_health": "健康",
         "trend_stress": "压力",
         "trend_energy": "能量",
+        "key_insights": "关键洞察",
+        "no_insights": "完成更多评估后可解锁个性化洞察。",
         "improving": "改善中",
         "stable": "稳定",
         "declining": "下降中",
@@ -343,7 +348,36 @@ render_section_label(t["trends"])
 
 trends = data.get("trends", {})
 metrics = trends.get("metrics", []) if trends else []
-trend_map = {m["metric"]: m for m in metrics}
+trend_map = {
+    m.get("metric"): m
+    for m in metrics
+    if isinstance(m, dict) and m.get("metric")
+}
+
+
+def _dash_number(value):
+    try:
+        if value is None:
+            return "—"
+        number = float(value)
+        if number.is_integer():
+            return str(int(number))
+        return str(round(number, 1))
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _dash_change_text(value):
+    try:
+        if value is None:
+            return "—"
+        number = float(value)
+        sign = "+" if number > 0 else ""
+        if number.is_integer():
+            return f"{sign}{int(number)}"
+        return f"{sign}{round(number, 1)}"
+    except (TypeError, ValueError):
+        return "—"
 
 trend_configs = [
     ("trend_health", "health_score", "🟢" if language == "English" else "🟢"),
@@ -360,6 +394,15 @@ for idx, (label_key, metric_key, icon) in enumerate(trend_configs):
         direction = tm.get("direction", "insufficient_data")
         dir_icon = {"improving": "↑", "stable": "→", "declining": "↓"}.get(direction, "·")
         dir_label = t.get(direction, t["insufficient"])
+        current_value = _dash_number(tm.get("current"))
+        change_value = _dash_change_text(tm.get("change"))
+        change_label = (
+            f"{change_value} this week"
+            if language == "English" and change_value != "—"
+            else f"本周 {change_value}"
+            if language == "中文" and change_value != "—"
+            else t["insufficient"]
+        )
 
         color_map = {
             "improving": {"health_score": "#22c55e", "stress": "#22c55e", "energy": "#22c55e"},
@@ -382,14 +425,47 @@ for idx, (label_key, metric_key, icon) in enumerate(trend_configs):
             margin-bottom: 12px;
         ">
             <div style="font-size: 13px; color: #667085; font-weight: 700;">{t[label_key]}</div>
-            <div style="font-size: 28px; font-weight: 900; color: {txt_color}; margin: 4px 0;">
-                {dir_icon}
+            <div style="font-size: 30px; font-weight: 900; color: {txt_color}; margin: 4px 0;">
+                {dir_icon} {current_value}
             </div>
-            <div style="font-size: 14px; color: {txt_color}; font-weight: 600;">
+            <div style="font-size: 13px; color: {txt_color}; font-weight: 700;">
+                {change_label}
+            </div>
+            <div style="font-size: 12px; color: #667085; margin-top: 4px;">
                 {dir_label}
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════
+# Key Insights
+# ══════════════════════════════════════════════════
+render_section_label(t["key_insights"])
+
+insights = build_trend_insights(data, language)
+
+if insights:
+    insight_cols = st.columns(min(len(insights), 4))
+    for idx, insight in enumerate(insights):
+        with insight_cols[idx % len(insight_cols)]:
+            st.markdown(f"""
+            <div style="
+                background: white;
+                border: 1px solid #d9e2e7;
+                border-radius: 10px;
+                padding: 16px;
+                min-height: 132px;
+                margin-bottom: 18px;
+                box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+            ">
+                <div style="font-size: 24px; margin-bottom: 10px;">{insight.get("icon", "•")}</div>
+                <div style="font-size: 14px; color: #172026; line-height: 1.55; font-weight: 600;">
+                    {insight.get("text", "")}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+else:
+    st.info(t["no_insights"])
 
 # ══════════════════════════════════════════════════
 # Local AI Wellness Summary (rule-based, no API call)
