@@ -6,6 +6,10 @@ from typing import Any
 import streamlit as st
 
 from modules.coach_engine import build_coaching_response
+from modules.coach_memory import (
+    compress_conversation,
+    has_reference_to_past,
+)
 from modules.ui import apply_product_theme, render_topbar
 
 st.set_page_config(page_title="AI Coach", page_icon="W", layout="wide")
@@ -98,12 +102,61 @@ def gather_context() -> dict[str, Any]:
     return ctx
 
 
-def generate_response(question: str, context: dict) -> dict:
+def _current_context_text(context: dict) -> str:
+    return (
+        f"Health: {context.get('health')}\n"
+        f"Emotion: {context.get('emotion')}\n"
+        f"Trends: {context.get('trends')}\n"
+        f"Report: {context.get('report')}"
+    )
+
+
+def _memory_prompt(question: str, context: dict, compressed_history: str) -> str:
+    current_context = _current_context_text(context)
+    previous_section = (
+        f"Previous Conversation:\n{compressed_history}\n\n"
+        if compressed_history
+        else ""
+    )
+    return f"""{previous_section}Current Health Context:
+{current_context}
+
+User Question:
+{question}
+
+Instructions:
+Act as a supportive wellness coach.
+Reference earlier discussion when relevant.
+Keep recommendations practical and personalised.
+"""
+
+
+def _append_memory_to_situation(result: dict, compressed_history: str) -> dict:
+    if not compressed_history:
+        return result
+
+    memory_note = (
+        "根据我们最近的对话，我会在之前讨论内容的基础上继续提供建议。"
+        if is_cn
+        else "Based on our recent conversation, I will continue building on the earlier topics we discussed."
+    )
+    updated = dict(result)
+    situation = updated.get("situation", "")
+    updated["situation"] = f"{situation}\n\n{memory_note}" if situation else memory_note
+    return updated
+
+
+def generate_response(question: str, context: dict, compressed_history: str) -> dict:
+    memory_prompt = _memory_prompt(question, context, compressed_history)
+    st.session_state["coach_compressed_memory"] = compressed_history
+    st.session_state["coach_memory_prompt"] = memory_prompt
+    st.session_state["coach_references_past"] = has_reference_to_past(question)
+
     has_data = context.get("health") is not None or context.get("emotion") is not None
     if not has_data:
         if is_cn:
-            return {"situation": "暂无健康或情绪数据。", "strengths": [], "concerns": [], "actions": ["请先完成健康检测和情绪分析。"], "goal": "完成首次检测。"}
-        return {"situation": "No health or emotion data available.", "strengths": [], "concerns": [], "actions": ["Complete a Health Check and Mind Reset first."], "goal": "Complete your first assessment."}
+            return _append_memory_to_situation({"situation": "暂无健康或情绪数据。", "strengths": [], "concerns": [], "actions": ["请先完成健康检测和情绪分析。"], "goal": "完成首次检测。"}, compressed_history)
+        return _append_memory_to_situation({"situation": "No health or emotion data available.", "strengths": [], "concerns": [], "actions": ["Complete a Health Check and Mind Reset first."], "goal": "Complete your first assessment."}, compressed_history)
 
     # Try DeepSeek via report API
     if BACKEND_AVAILABLE:
@@ -117,15 +170,28 @@ def generate_response(question: str, context: dict) -> dict:
                 actions = ["Focus on your highest-priority module", "Maintain consistent tracking"]
                 if "sleep" in report_text.lower()[:300]:
                     actions[0] = "Prioritise sleep quality improvement"
+                if compressed_history:
+                    report_text = (
+                        f"{report_text}\n\n"
+                        "Based on our recent conversation, I will continue building on the earlier topics we discussed."
+                    )
                 if not is_cn:
                     return {"situation": report_text[:600], "strengths": [], "concerns": [], "actions": actions, "goal": "Review the full AI report for details."}
                 actions_cn = ["关注优先级最高的模块", "保持定期记录"]
                 if "sleep" in report_text.lower()[:300]:
                     actions_cn[0] = "优先改善睡眠质量"
+                if compressed_history:
+                    report_text = (
+                        f"{report_text}\n\n"
+                        "根据我们最近的对话，我会在之前讨论内容的基础上继续提供建议。"
+                    )
                 return {"situation": report_text[:600], "strengths": [], "concerns": [], "actions": actions_cn, "goal": "查看完整 AI 报告获取详细建议。"}
         except Exception:
             pass
-    return build_coaching_response(context, question, language)
+    return _append_memory_to_situation(
+        build_coaching_response(context, question, language),
+        compressed_history,
+    )
 
 
 SUGGESTIONS_EN = [
@@ -185,10 +251,19 @@ def ask(question: str):
         return
     q = question.strip()
     ctx = gather_context()
+    compressed_history = compress_conversation(
+        st.session_state.coach_msgs,
+        max_turns=5,
+    )
     now = datetime.now().strftime("%H:%M")
     st.session_state.coach_msgs.append({"role": "user", "content": q, "time": now})
-    result = generate_response(q, ctx)
+    result = generate_response(q, ctx, compressed_history)
     st.session_state.coach_msgs.append({"role": "assistant", "content": _format(result, q), "time": datetime.now().strftime("%H:%M")})
+    st.session_state.coach_msgs = st.session_state.coach_msgs[-20:]
+    st.session_state["coach_compressed_memory"] = compress_conversation(
+        st.session_state.coach_msgs,
+        max_turns=5,
+    )
 
 
 # ── UI ────────────────────────────────────────────
@@ -227,6 +302,9 @@ if msgs:
     with c1:
         if st.button(f"🗑️ {t['clear']}", use_container_width=False):
             st.session_state.coach_msgs = []
+            st.session_state.pop("coach_compressed_memory", None)
+            st.session_state.pop("coach_memory_prompt", None)
+            st.session_state.pop("coach_references_past", None)
             st.rerun()
     with c2:
         if st.button("🏠 Back to Dashboard" if language == "English" else "🏠 返回看板", use_container_width=True):
