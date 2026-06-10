@@ -1,12 +1,19 @@
 import streamlit as st
 from datetime import datetime
 import os
+from io import BytesIO
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 import pandas as pd
 
 from database import load_json, filter_user, HEALTH_JSON, MIND_JSON
+
+try:
+    from modules.pdf_report import generate_pdf as generate_pdf_report
+    PDF_AVAILABLE = True
+except Exception:
+    PDF_AVAILABLE = False
 from modules.ui import (
     apply_product_theme,
     require_auth,
@@ -48,6 +55,7 @@ TEXT = {
         "ai_error": "AI report generation is unavailable. Please check your OpenAI API key and try again.",
         "fallback_notice": "AI generation is unavailable, so a local summary was generated instead.",
         "download": "Download Report",
+        "download_pdf": "Export PDF",
 
         "no_data": "No health or mind records found for this user.",
 
@@ -101,6 +109,7 @@ TEXT = {
         "ai_error": "AI 报告暂时无法生成，请检查 OpenAI API Key 后重试。",
         "fallback_notice": "AI 生成暂时不可用，已为你生成本地综合报告。",
         "download": "下载报告",
+        "download_pdf": "导出 PDF",
 
         "no_data": "未找到该用户的健康或情绪记录。",
 
@@ -895,16 +904,51 @@ else:
         render_panel(t["insight_title"])
         st.markdown(report)
         st.session_state["final_report_text"] = report
+        st.session_state["final_report_data"] = {
+            "latest_health": latest_health,
+            "latest_mind": latest_mind,
+            "history_summary": history_summary,
+        }
 
 if st.session_state.get("final_report_text"):
     report_date = datetime.now().strftime("%Y%m%d")
-    st.download_button(
-        t["download"],
-        data=st.session_state["final_report_text"],
-        file_name=f"wellnest_report_{user_name}_{report_date}.md",
-        mime="text/markdown",
-        use_container_width=True,
-    )
+
+    col_pdf, col_md = st.columns(2)
+
+    with col_md:
+        st.download_button(
+            t["download"],
+            data=st.session_state["final_report_text"],
+            file_name=f"wellnest_report_{user_name}_{report_date}.md",
+            mime="text/markdown",
+            use_container_width=True,
+        )
+
+    with col_pdf:
+        if PDF_AVAILABLE:
+            report_data = st.session_state.get("final_report_data", {})
+            try:
+                pdf_bytes = generate_pdf_report(
+                    user_name=user_name,
+                    language=language,
+                    report_text=st.session_state["final_report_text"],
+                    latest_health=report_data.get("latest_health"),
+                    latest_mind=report_data.get("latest_mind"),
+                    history_summary=report_data.get("history_summary"),
+                )
+                st.download_button(
+                    t["download_pdf"],
+                    data=pdf_bytes,
+                    file_name=f"wellnest_report_{user_name}_{report_date}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                )
+            except Exception:
+                st.caption(
+                    "PDF export unavailable (font rendering issue)"
+                    if language == "English"
+                    else "PDF 导出不可用（字体渲染问题）"
+                )
 
 st.divider()
 
