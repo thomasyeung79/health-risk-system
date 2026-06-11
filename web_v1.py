@@ -83,6 +83,9 @@ TEXT = {
         "password_error": "Username or password is incorrect.",
         "saved": "Signed in. You can now continue.",
         "logout": "Log out",
+        "logout_confirm": "Are you sure you want to log out?",
+        "yes": "Yes",
+        "no": "Cancel",
         "locked": "Sign in to unlock all modules.",
         "login_tab": "Sign in",
         "register_tab": "Create account",
@@ -134,6 +137,9 @@ TEXT = {
         "password_error": "用户名或密码不正确。",
         "saved": "已登录，现在可以继续。",
         "logout": "退出登录",
+        "logout_confirm": "确认退出登录？",
+        "yes": "确认",
+        "no": "取消",
         "locked": "登录后可使用全部模块。",
         "login_tab": "登录",
         "register_tab": "注册",
@@ -362,12 +368,10 @@ else:
         st.session_state["confirm_logout"] = True
 
     if st.session_state.get("confirm_logout"):
-        st.warning(
-            "Are you sure you want to log out?" if language == "English" else "确认退出登录？"
-        )
+        st.warning(t["logout_confirm"])
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("Yes" if language == "English" else "确认", use_container_width=True, key="confirm_logout_yes"):
+            if st.button(t["yes"], use_container_width=True, key="confirm_logout_yes"):
                 # Prefer API logout if available
                 if BACKEND_AVAILABLE and st.session_state.get("api_refresh_token"):
                     try:
@@ -386,7 +390,7 @@ else:
                 st.session_state["confirm_logout"] = False
                 st.rerun()
         with c2:
-            if st.button("Cancel" if language == "English" else "取消", use_container_width=True, key="confirm_logout_no"):
+            if st.button(t["no"], use_container_width=True, key="confirm_logout_no"):
                 st.session_state["confirm_logout"] = False
                 st.rerun()
 

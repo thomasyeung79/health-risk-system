@@ -956,7 +956,5 @@ st.caption(
     t["footer"]
 )
 
-if st.button("Back to Home" if language == "English" else "返回首页",
-             key="final_report_back_home"
-):
+if st.button(t["back"], key="final_report_back_home"):
     st.switch_page("web_v1.py")
