@@ -12,3 +12,4 @@ build/
 app_icon.svg
 build_app.py
 build_icon.py
+data/
