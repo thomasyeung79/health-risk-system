@@ -3,7 +3,7 @@ name: Backend CI
 on:
   push:
     paths:
-      - 'AI_Wellness_Platform/backend/**'
+      - 'backend/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
