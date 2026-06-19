@@ -31,7 +31,10 @@ try:
         # Restore api_auth_client from existing api_client on page reload
         if "api_auth_client" not in st.session_state:
             st.session_state["api_auth_client"] = ApiAuthClient(st.session_state["api_client"])
-        BACKEND_AVAILABLE = True
+        _client = st.session_state["api_client"]
+        _health = _client.get("/health")
+        if _health.get("status") == "ok":
+            BACKEND_AVAILABLE = True
 except Exception:
     # Backend not available — will use legacy mode
     pass
@@ -91,8 +94,10 @@ TEXT = {
         "register_tab": "Create account",
         "create_account": "Create account",
         "confirm_password": "Confirm password",
-        "register_success": "Account created. You can sign in now.",
+        "register_success": "Account created. You are signed in now.",
         "user_exists": "This user already exists.",
+        "existing_login_success": "This account already exists, so you have been signed in.",
+        "user_exists_wrong_password": "This username already exists. Please sign in with the correct password or choose another username.",
         "password_short": "Password must be at least 6 characters.",
         "password_mismatch": "Passwords do not match.",
         "snapshot_label": "Today at a glance",
@@ -145,8 +150,10 @@ TEXT = {
         "register_tab": "注册",
         "create_account": "创建账号",
         "confirm_password": "确认密码",
-        "register_success": "账号已创建，现在可以登录。",
+        "register_success": "账号已创建，已为你自动登录。",
         "user_exists": "该用户已存在。",
+        "existing_login_success": "该账号已存在，已为你自动登录。",
+        "user_exists_wrong_password": "该用户名已存在，请使用正确密码登录，或换一个用户名注册。",
         "password_short": "密码至少需要6位。",
         "password_mismatch": "两次输入的密码不一致。",
         "snapshot_label": "今日概览",
@@ -190,6 +197,30 @@ with top_col2:
 
 t = TEXT[language]
 
+
+def set_api_login_state(result, current_language):
+    user = result["user"]
+    st.session_state["access_token"] = st.session_state["api_client"].access_token
+    st.session_state["refresh_token"] = st.session_state["api_client"].refresh_token
+    st.session_state["api_user"] = user
+    st.session_state["user_name"] = user["username"]
+    st.session_state["authenticated"] = True
+    st.session_state["session_start"] = datetime.now()
+    st.session_state["language"] = current_language
+
+
+def set_local_login_state(username, current_language):
+    st.session_state["language"] = current_language
+    st.session_state["user_name"] = username.strip()
+    st.session_state["authenticated"] = True
+    st.session_state["session_start"] = datetime.now()
+    st.session_state["assessment_completed"] = True
+    st.session_state["assessment_data"] = {
+        "user_name": username.strip(),
+        "language": current_language,
+    }
+
+
 render_topbar(language, user_name)
 render_nav(language, "web_v1.py")
 
@@ -232,14 +263,7 @@ if not is_authenticated():
                 auth = st.session_state["api_auth_client"]
                 try:
                     result = auth.login(login_name.strip(), login_password)
-                    user = result["user"]
-                    st.session_state["access_token"] = st.session_state["api_client"].access_token
-                    st.session_state["refresh_token"] = st.session_state["api_client"].refresh_token
-                    st.session_state["api_user"] = user
-                    st.session_state["user_name"] = user["username"]
-                    st.session_state["authenticated"] = True
-                    st.session_state["session_start"] = datetime.now()
-                    st.session_state["language"] = language
+                    set_api_login_state(result, language)
                     st.success(t["saved"])
                     st.rerun()
                 except Exception:
@@ -282,9 +306,18 @@ if not is_authenticated():
                         display_name=register_name.strip(),
                         preferred_language=language,
                     )
+                    result = auth.login(register_name.strip(), register_password)
+                    set_api_login_state(result, language)
                     st.success(t["register_success"])
+                    st.rerun()
                 except Exception:
-                    st.error(t["user_exists"])
+                    try:
+                        result = auth.login(register_name.strip(), register_password)
+                        set_api_login_state(result, language)
+                        st.success(t["existing_login_success"])
+                        st.rerun()
+                    except Exception:
+                        st.error(t["user_exists_wrong_password"])
     else:
         # Legacy fallback login (no backend available)
         st.warning(
@@ -317,15 +350,7 @@ if not is_authenticated():
                     st.error(t["password_error"])
                     st.stop()
 
-                st.session_state["language"] = language
-                st.session_state["user_name"] = login_name.strip()
-                st.session_state["authenticated"] = True
-                st.session_state["session_start"] = datetime.now()
-                st.session_state["assessment_completed"] = True
-                st.session_state["assessment_data"] = {
-                    "user_name": login_name.strip(),
-                    "language": language,
-                }
+                set_local_login_state(login_name, language)
                 st.success(t["saved"])
                 st.rerun()
 
@@ -358,11 +383,17 @@ if not is_authenticated():
                     st.error(t["password_mismatch"])
                     st.stop()
 
-                if not register_user(register_name, register_password):
-                    st.error(t["user_exists"])
-                    st.stop()
+                if register_user(register_name, register_password):
+                    set_local_login_state(register_name, language)
+                    st.success(t["register_success"])
+                    st.rerun()
 
-                st.success(t["register_success"])
+                if authenticate_user(register_name, register_password):
+                    set_local_login_state(register_name, language)
+                    st.success(t["existing_login_success"])
+                    st.rerun()
+
+                st.error(t["user_exists_wrong_password"])
 else:
     if st.button(t["logout"], use_container_width=True, key="main_logout"):
         st.session_state["confirm_logout"] = True
