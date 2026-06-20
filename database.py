@@ -4,10 +4,11 @@ import os
 import pandas as pd
 
 # ── File paths ──────────────────────────────────────
-HEALTH_CSV = "health_records.csv"
-HEALTH_JSON = "health_history.json"
-MIND_JSON = "insight_records.json"
-USERS_FILE = "wellnest_users.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HEALTH_CSV = os.path.join(BASE_DIR, "health_records.csv")
+HEALTH_JSON = os.path.join(BASE_DIR, "health_history.json")
+MIND_JSON = os.path.join(BASE_DIR, "insight_records.json")
+USERS_FILE = os.path.join(BASE_DIR, "wellnest_users.json")
 
 
 # ── Generic helpers ─────────────────────────────────

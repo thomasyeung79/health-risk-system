@@ -37,7 +37,8 @@ try:
     emotion_api = EmotionClient(client)
     report_api = ReportClient(client)
     trend_api = TrendClient(client)
-    BACKEND_AVAILABLE = client.is_authenticated
+    health_status = client.get("/health")
+    BACKEND_AVAILABLE = client.is_authenticated and health_status.get("status") == "ok"
 except Exception:
     pass
 
@@ -62,6 +63,34 @@ def load_emotion_records_api():
         return result.get("items", [])
     except Exception:
         return []
+
+
+def _record_key(record):
+    if not isinstance(record, dict):
+        return ""
+    src = record.get("result", record)
+    return "|".join([
+        str(record.get("id", "")),
+        str(record.get("created_at") or record.get("timestamp") or ""),
+        str(src.get("health_score") or src.get("overall_score") or ""),
+        str(record.get("user_name") or record.get("username") or ""),
+    ])
+
+
+def _merge_records(*record_groups):
+    merged = []
+    seen = set()
+    for records in record_groups:
+        for record in records or []:
+            if not isinstance(record, dict):
+                continue
+            key = _record_key(record)
+            if key and key in seen:
+                continue
+            if key:
+                seen.add(key)
+            merged.append(record)
+    return merged
 
 st.set_page_config(
     page_title="Wellness History",
@@ -136,17 +165,32 @@ if st.button(t["back"]):
 
 
 # ── Load data ───────────────────────────────────────
-if BACKEND_AVAILABLE:
-    health_records = load_health_records_api()
-    mind_records = load_emotion_records_api()
-else:
-    # Legacy fallback
-    from database import load_health_records, load_mind_records, filter_user
+from database import (
+    load_health_json,
+    load_health_records,
+    load_mind_records,
+    filter_user,
+)
 
-    health_df = load_health_records()
-    mind_df = load_mind_records()
-    health_records = filter_user(health_df.to_dict("records"), user_name)
-    mind_records = filter_user(mind_df.to_dict("records"), user_name)
+api_health_records = load_health_records_api() if BACKEND_AVAILABLE else []
+api_mind_records = load_emotion_records_api() if BACKEND_AVAILABLE else []
+
+health_df = load_health_records()
+local_health_csv = filter_user(health_df.to_dict("records"), user_name)
+local_health_json = filter_user(load_health_json(), user_name)
+
+mind_df = load_mind_records()
+local_mind_records = filter_user(mind_df.to_dict("records"), user_name)
+
+health_records = _merge_records(
+    api_health_records,
+    local_health_json,
+    local_health_csv,
+)
+mind_records = _merge_records(
+    api_mind_records,
+    local_mind_records,
+)
 
 st.divider()
 

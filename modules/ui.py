@@ -41,6 +41,16 @@ NAV_ITEMS = {
 
 
 
+DISCLAIMER = {
+    "English": "This self-assessment tool is for informational and educational purposes only. "
+               "It does not provide medical diagnosis, treatment, or therapy. "
+               "If you have health concerns, consult a qualified healthcare professional.",
+    "中文": "本健康自评工具仅供信息参考和教育目的使用。"
+           "它不提供医疗诊断、治疗或心理治疗。"
+           "如有健康问题，请咨询合格的专业医疗人员。",
+}
+
+
 def apply_product_theme():
     st.markdown(
         """
