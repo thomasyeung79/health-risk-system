@@ -16,6 +16,7 @@ from modules.ui import (
 
 # Try to initialize API client for backend connection
 BACKEND_AVAILABLE = False
+BACKEND_CHECK_ERROR = None
 try:
     from api_client.client import ApiClient
     from api_client.auth_client import AuthClient as ApiAuthClient
@@ -36,9 +37,9 @@ try:
         _health = _client.get("/health")
         if _health.get("status") == "ok":
             BACKEND_AVAILABLE = True
-except Exception:
+except Exception as _backend_err:
     # Backend not available — will use legacy mode
-    pass
+    BACKEND_CHECK_ERROR = _backend_err
 
 # Restore tokens to API client from session state on page reload
 if BACKEND_AVAILABLE and st.session_state.get("access_token"):
@@ -322,11 +323,25 @@ if not is_authenticated():
                         st.error(t["user_exists_wrong_password"])
     else:
         # Legacy fallback login (no backend available)
-        st.warning(
-            "⚠️ Backend server not detected. Using legacy local login."
-            if language == "English"
-            else "⚠️ 未检测到后端服务器，使用本地登录模式。"
+        _help_msg = (
+            "For full backend features, start the server in another terminal:\n\n"
+            "    cd backend\n"
+            "    uvicorn app.main:app --reload --port 8000\n\n"
+            "Or with Docker:\n\n"
+            "    docker compose up\n\n"
+            "Health check: http://localhost:8000/health"
         )
+        _warning_en = f"⚠️ Backend API is not available. Using legacy local login.\n\n{_help_msg}"
+        _warning_cn = (
+            "⚠️ 后端 API 不可用，使用本地登录模式。\n\n"
+            "如需完整后端功能，请在另一个终端中启动服务器：\n\n"
+            "    cd backend\n"
+            "    uvicorn app.main:app --reload --port 8000\n\n"
+            "或用 Docker 启动：\n\n"
+            "    docker compose up\n\n"
+            "健康检查：http://localhost:8000/health"
+        )
+        st.warning(_warning_en if language == "English" else _warning_cn)
         from modules.ui import authenticate_user, register_user
 
         login_tab, register_tab = st.tabs([t["login_tab"], t["register_tab"]])
