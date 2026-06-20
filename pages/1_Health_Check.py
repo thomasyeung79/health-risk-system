@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 
-from database import save_health_json
+from database import save_health_json, save_health_record
 from modules.health_analyzer import calculate_overall_result
 from modules.bmi import calc_bmi
 from modules.water_ratio import calc_water_ratio
@@ -17,6 +17,7 @@ from modules.ui import (
     require_auth,
     require_user,
     render_hero,
+    render_medical_disclaimer,
     render_nav,
     render_panel,
     render_section_label,
@@ -266,6 +267,8 @@ render_hero(
     "Health intake" if language == "English" else "健康录入",
     t["intro"],
 )
+
+render_medical_disclaimer(language)
 
 if st.button(t["back"], key="top_back_home"):
     st.switch_page("web_v1.py")
@@ -524,6 +527,49 @@ if st.button(t["generate"], use_container_width=True):
         primary_focus = overall_result["primary_focus"]
         action_plan = overall_result["action_plan"]
 
+        module_scores = {
+            r.get("name"): r.get("score")
+            for r in results
+            if isinstance(r, dict)
+        }
+
+        record = {
+            "user_name": user_name,
+            "username": user_name,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "health_score": overall_score,
+            "overall_score": overall_score,
+            "risk_percent": risk_percent,
+            "risk_level": overall_level,
+            "risk_score": overall_result["risk_score"],
+            "max_risk_score": overall_result["max_risk_score"],
+            "interaction_score": interaction_score,
+            "interaction_notes": interaction_notes,
+            "summary": overall_summary,
+            "primary_focus": primary_focus,
+            "action_plan": action_plan,
+            "bmi_score": module_scores.get("BMI"),
+            "water_score": module_scores.get("Water"),
+            "sleep_score": module_scores.get("Sleep"),
+            "activity_score": module_scores.get("Activity"),
+            "diet_score": module_scores.get("Diet"),
+            "mental_score": module_scores.get("Mental"),
+            "screen_score": module_scores.get("Screen"),
+            "habit_score": module_scores.get("Habit"),
+            "source": "api" if api_success else "local",
+        }
+
+        try:
+            save_health_json(record)
+            save_health_record(record)
+        except Exception as exc:
+            st.error(
+                f"Failed to save health record: {exc}"
+                if language == "English"
+                else f"健康记录保存失败：{exc}"
+            )
+            st.stop()
+
         st.success(t["saved"])
 
         col1, col2, col3 = st.columns(3)
@@ -662,32 +708,6 @@ if st.button(t["generate"], use_container_width=True):
 
                 for suggestion in r["suggestions"]:
                     st.write("-", suggestion)
-
-        if not api_success:
-            record = {
-                "user_name": user_name,
-                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "health_score": overall_score,
-                "risk_percent": risk_percent,
-                "risk_level": overall_level,
-                "risk_score": overall_result["risk_score"],
-                "max_risk_score": overall_result["max_risk_score"],
-                "interaction_score": interaction_score,
-                "interaction_notes": interaction_notes,
-                "summary": overall_summary,
-                "primary_focus": primary_focus,
-                "action_plan": action_plan,
-                "bmi_score": bmi_result["score"],
-                "water_score": water_result["score"],
-                "sleep_score": sleep_result["score"],
-                "activity_score": activity_result["score"],
-                "diet_score": diet_result["score"],
-                "mental_score": mental_result["score"],
-                "screen_score": screen_result["score"],
-                "habit_score": habit_result["score"],
-           }
-
-            save_health_json(record)
 
 st.divider()
 

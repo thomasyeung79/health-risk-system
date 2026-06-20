@@ -7,6 +7,7 @@ import streamlit as st
 from modules.dashboard_insights import build_trend_insights
 from modules.ui import (
     apply_product_theme,
+    render_medical_disclaimer,
     render_section_label,
     render_topbar,
 )
@@ -223,6 +224,8 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════
+render_medical_disclaimer(language)
+
 # Empty State
 # ══════════════════════════════════════════════════
 if not has_data:

@@ -7,6 +7,7 @@ from modules.ui import (
     render_hero,
     render_feature_strip,
     render_journey_steps,
+    render_medical_disclaimer,
     render_module_card,
     render_nav,
     render_section_label,
@@ -78,7 +79,7 @@ TEXT = {
         "coach_title": "AI Coach",
         "coach_desc": "Chat with your AI wellness coach.",
         "open": "Open",
-        "footer": "WellNest AI | Product demo v3.0",
+        "footer": "WellNest AI | Product demo v1.0.0-rc",
         "name_input": "User name",
         "password_input": "Password",
         "confirm": "Start wellness session",
@@ -134,7 +135,7 @@ TEXT = {
         "coach_title": "AI 教练",
         "coach_desc": "与 AI 健康教练对话。",
         "open": "进入",
-        "footer": "WellNest AI | 产品演示 v3.0",
+        "footer": "WellNest AI | 产品演示 v1.0.0-rc",
         "name_input": "用户姓名",
         "password_input": "密码",
         "confirm": "开始健康会话",
@@ -235,6 +236,7 @@ render_section_label(t["path_label"])
 render_journey_steps(t["journey"])
 
 render_section_label("Workspace" if language == "English" else "工作台")
+render_medical_disclaimer(language)
 
 if not is_authenticated():
     st.info(t["locked"])

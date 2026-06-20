@@ -8,6 +8,7 @@ from modules.ui import (
     require_auth,
     require_user,
     render_hero,
+    render_medical_disclaimer,
     render_nav,
     render_panel,
     render_section_label,
@@ -184,6 +185,8 @@ render_hero(
     "Emotional check-in" if language == "English" else "情绪签到",
     t["intro"],
 )
+
+render_medical_disclaimer(language)
 
 if st.button(t["back"], key="mind_back_home"):
     st.switch_page("web_v1.py")

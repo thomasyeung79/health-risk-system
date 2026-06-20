@@ -10,7 +10,7 @@ from modules.coach_memory import (
     compress_conversation,
     has_reference_to_past,
 )
-from modules.ui import apply_product_theme, render_topbar
+from modules.ui import apply_product_theme, render_medical_disclaimer, render_topbar
 
 st.set_page_config(page_title="AI Coach", page_icon="W", layout="wide")
 apply_product_theme()
@@ -269,6 +269,7 @@ def ask(question: str):
 # ── UI ────────────────────────────────────────────
 st.title(t["title"])
 st.markdown(t["subtitle"])
+render_medical_disclaimer(language)
 
 msgs = st.session_state.coach_msgs
 if msgs:
