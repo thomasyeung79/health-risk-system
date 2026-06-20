@@ -51,6 +51,28 @@ DISCLAIMER = {
 }
 
 
+def get_disclaimer_text(language="English") -> str:
+    """Return the localized disclaimer text without rendering.
+
+    Args:
+        language: "English" or "中文"
+
+    Returns:
+        The disclaimer string for the given language, falling back to English.
+    """
+    return DISCLAIMER.get(language, DISCLAIMER["English"])
+
+
+def render_medical_disclaimer(language="English"):
+    """Render a bilingual medical disclaimer panel via st.warning().
+
+    Args:
+        language: "English" or "中文"
+    """
+    text = get_disclaimer_text(language)
+    st.warning(text)
+
+
 def apply_product_theme():
     st.markdown(
         """
