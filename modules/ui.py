@@ -622,19 +622,6 @@ def is_authenticated():
     return True
 
 
-def render_medical_disclaimer(language="English"):
-    if language == "English":
-        st.warning(
-            "This tool is for self-assessment only. It does not provide medical diagnosis, "
-            "treatment, or therapy. If you have health concerns, consult a qualified professional."
-        )
-    else:
-        st.warning(
-            "本工具仅用于自我评估，不提供医学诊断、治疗或心理治疗。"
-            "如有健康疑虑，请咨询合格的医疗或心理健康专业人士。"
-        )
-
-
 def require_auth(language):
     if is_authenticated():
         return

@@ -5,6 +5,17 @@ All notable changes to AI Wellness Platform are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses semantic versioning for portfolio releases.
 
+## [1.0.0-rc.3] - 2026-06-21
+
+### Fixed
+- Removed duplicate `render_medical_disclaimer()` definition that was overwriting the DISCLAIMER-backed version.
+- Added `get_disclaimer_text()` pure function and `render_medical_disclaimer()` for consistent bilingual disclaimer rendering.
+
+### Changed
+- Bumped version from rc.1 to rc.3 to align all version references (README badge, backend, footer).
+- database.py: made file paths absolute to fix Docker/PyInstaller working-directory issues.
+- Wellness History page: added record deduplication when both API and local data sources have overlapping records.
+
 ## [1.0.0-rc.1] - 2026-06-18
 
 ### Added

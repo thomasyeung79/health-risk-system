@@ -3,7 +3,7 @@
 > A bilingual (English / 中文) AI-powered wellness platform that combines **8-module health assessment**, **emotion analysis**, **trend tracking**, and **AI-generated wellness reports** into a single, privacy-first application.
 
 [![Backend CI](https://github.com/thomasyeung79/health-risk-system/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/thomasyeung79/health-risk-system/actions/workflows/backend-ci.yml)
-[![Version](https://img.shields.io/badge/version-v1.0.0--rc.1-blueviolet.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v1.0.0--rc.3-blueviolet.svg)](CHANGELOG.md)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.136+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.38+-FF4B4B.svg?logo=streamlit)](https://streamlit.io/)
