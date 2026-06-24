@@ -13,7 +13,7 @@ language = st.session_state.get("language", "English")
 TEXT = {
     "English": {
         "title": "Sign In",
-        "subtitle": "Connect to your wellness account via the backend API.",
+        "subtitle": "Sign in to continue your wellness session.",
         "login_tab": "Sign In",
         "register_tab": "Create Account",
         "username": "Username",
@@ -27,17 +27,17 @@ TEXT = {
         "login_success": "Signed in successfully!",
         "register_success": "Account created! You can now sign in.",
         "error_generic": "Something went wrong.",
-        "error_connection": "Cannot connect to backend server.\n\nPlease ensure the backend is running at **localhost:8000**.\n\n```bash\ncd AI_Wellness_Platform/backend\nuvicorn app.main:app --reload --port 8000\n```",
+        "error_connection": "Account services are currently running in local mode. Please return to Home and sign in there.",
         "error_auth": "Invalid username or password.",
         "error_exists": "Username already exists.",
         "password_short": "Password must be at least 6 characters.",
         "password_mismatch": "Passwords do not match.",
         "back_home": "Back to Home",
-        "footer": "WellNest AI | API Client Mode",
+        "footer": "WellNest AI | Account Access",
     },
     "中文": {
         "title": "登录",
-        "subtitle": "通过后端 API 连接到你的健康账号。",
+        "subtitle": "登录后继续你的健康会话。",
         "login_tab": "登录",
         "register_tab": "创建账号",
         "username": "用户名",
@@ -51,13 +51,13 @@ TEXT = {
         "login_success": "登录成功！",
         "register_success": "账号已创建！现在可以登录。",
         "error_generic": "发生错误。",
-        "error_connection": "无法连接到后端服务器。\n\n请确保后端已在 **localhost:8000** 运行。\n\n```bash\ncd AI_Wellness_Platform/backend\nuvicorn app.main:app --reload --port 8000\n```",
+        "error_connection": "当前账号服务正在使用本地模式。请返回首页进行登录。",
         "error_auth": "用户名或密码不正确。",
         "error_exists": "该用户已存在。",
         "password_short": "密码至少需要6位。",
         "password_mismatch": "两次输入的密码不一致。",
         "back_home": "返回首页",
-        "footer": "WellNest AI | API 客户端模式",
+        "footer": "WellNest AI | 账号入口",
     },
 }
 
@@ -78,7 +78,9 @@ if "api_client" not in st.session_state:
         st.session_state["api_client"] = client
         st.session_state["auth_client"] = AuthClient(client)
     except Exception:
-        st.error(t["error_connection"])
+        st.info(t["error_connection"])
+        if st.button(t["back_home"], use_container_width=True, key="api_unavailable_home"):
+            st.switch_page("web_v1.py")
         st.stop()
 
 client = st.session_state["api_client"]

@@ -258,11 +258,7 @@ if st.button(t["generate"], use_container_width=True):
                 result = _adapt_emotion_api_response(api_raw)
                 api_success = True
             except Exception:
-                st.warning(
-                    "Backend API unavailable, using local analysis."
-                    if language == "English"
-                    else "后端 API 不可用，使用本地分析。"
-                )
+                pass
 
         if not api_success:
             result = run_reflection_engine(

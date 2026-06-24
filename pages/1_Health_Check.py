@@ -497,8 +497,7 @@ if st.button(t["generate"], use_container_width=True):
                 results, overall_result = _adapt_api_response(api_result)
                 api_success = True
             except Exception:
-                st.warning("Backend API unavailable, using local analysis."
-                           if language == "English" else "后端 API 不可用，使用本地分析。")
+                pass
 
         if not api_success:
             # Legacy fallback: run 8 engines locally

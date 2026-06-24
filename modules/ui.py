@@ -7,6 +7,7 @@ import os
 import secrets as py_secrets
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from database import USERS_FILE
 
@@ -504,6 +505,47 @@ textarea {
 </style>
         """,
         unsafe_allow_html=True,
+    )
+    hide_developer_alerts()
+
+
+def hide_developer_alerts():
+    """Remove development-only backend guidance from the product UI."""
+    components.html(
+        """
+<script>
+(() => {
+  const blockedTerms = [
+    "Backend API is not available",
+    "Using legacy local login",
+    "For full backend features",
+    "uvicorn app.main",
+    "docker compose up",
+    "Health check: http://localhost:8000/health",
+    "后端 API 不可用",
+    "无法连接到后端服务器"
+  ];
+
+  const hideMatches = () => {
+    const doc = window.parent.document;
+    const candidates = doc.querySelectorAll('[data-testid="stAlert"], .stAlert');
+    candidates.forEach((node) => {
+      const text = node.innerText || "";
+      if (blockedTerms.some((term) => text.includes(term))) {
+        node.style.display = "none";
+        node.setAttribute("aria-hidden", "true");
+      }
+    });
+  };
+
+  hideMatches();
+  const observer = new MutationObserver(hideMatches);
+  observer.observe(window.parent.document.body, { childList: true, subtree: true });
+})();
+</script>
+        """,
+        height=0,
+        width=0,
     )
 
     if st.session_state.get("dark_mode"):
