@@ -27,6 +27,7 @@ NAV_ITEMS = {
         ("Mind Reset", "pages/2_Mind_Reset.py"),
         ("History", "pages/3_Wellness_History.py"),
         ("Final Report", "pages/4_Final_Report.py"),
+        ("Wellness OS", "pages/7_Admin.py"),
     ],
     "中文": [
         ("首页", "web_v1.py"),
@@ -36,6 +37,7 @@ NAV_ITEMS = {
         ("情绪重整", "pages/2_Mind_Reset.py"),
         ("历史记录", "pages/3_Wellness_History.py"),
         ("综合报告", "pages/4_Final_Report.py"),
+        ("管理中心", "pages/7_Admin.py"),
     ],
 }
 

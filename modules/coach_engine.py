@@ -7,6 +7,8 @@ Bilingual (English / 中文).
 from datetime import datetime
 from typing import Any, Optional
 
+from modules.emotion_localization import localize_emotion
+
 
 def _score_label(score: Optional[float], higher_is_better: bool, language: str) -> str:
     """Return a qualitative label for a numeric score."""
@@ -86,7 +88,7 @@ def build_coaching_response(
     if emotion:
         stress = emotion.get("stress")
         energy = emotion.get("energy")
-        mood = emotion.get("mood_key", "—")
+        mood = localize_emotion(emotion.get("mood_key", "—"), lang)
         if stress is not None:
             slabel = _score_label(stress, False, lang)
             elabel = _score_label(energy, True, lang) if energy is not None else ""

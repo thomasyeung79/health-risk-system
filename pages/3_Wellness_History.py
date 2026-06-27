@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+from modules.emotion_localization import localize_emotion
 from modules.ui import (
     apply_product_theme,
     require_auth,
@@ -92,6 +93,15 @@ def _merge_records(*record_groups):
             merged.append(record)
     return merged
 
+
+def safe_to_datetime(values):
+    """Parse mixed API/local datetime strings without crashing the page."""
+    try:
+        return pd.to_datetime(values, format="mixed", errors="coerce")
+    except (TypeError, ValueError):
+        series = values if isinstance(values, pd.Series) else pd.Series(values)
+        return series.apply(lambda value: pd.to_datetime(value, errors="coerce"))
+
 st.set_page_config(
     page_title="Wellness History",
     page_icon="W",
@@ -115,6 +125,7 @@ TEXT = {
 
         "no_health": "No health records found.",
         "no_mind": "No mind reset records found.",
+        "no_chart": "Not enough valid dated records to draw this chart.",
 
         "summary": "History Summary",
 
@@ -136,6 +147,7 @@ TEXT = {
 
         "no_health": "暂无健康记录。",
         "no_mind": "暂无情绪记录。",
+        "no_chart": "暂无足够的有效日期记录用于绘制图表。",
 
         "summary": "历史总结",
 
@@ -238,19 +250,21 @@ with col1:
 
             if not chart_df.empty:
 
-                chart_df["created_at"] = pd.to_datetime(
-                    chart_df["created_at"]
-                )
+                chart_df["created_at"] = safe_to_datetime(chart_df["created_at"])
+                chart_df = chart_df.dropna(subset=["created_at"])
 
-                chart_df = chart_df.sort_values(
-                    "created_at"
-                )
-
-                st.line_chart(
-                    chart_df.set_index(
+                if chart_df.empty:
+                    st.info(t["no_chart"])
+                else:
+                    chart_df = chart_df.sort_values(
                         "created_at"
-                    )["health_score"]
-                )
+                    )
+
+                    st.line_chart(
+                        chart_df.set_index(
+                            "created_at"
+                        )["health_score"]
+                    )
 
 
 with col2:
@@ -266,9 +280,10 @@ with col2:
 
         for r in mind_records:
             # Map API format or legacy format to display columns
+            mood_value = r.get("mood") or r.get("mood_key", "")
             mind_rows.append({
                 "created_at": r.get("created_at", ""),
-                "mood": r.get("mood") or r.get("mood_key", ""),
+                "mood": localize_emotion(mood_value, language),
                 "event": r.get("event") or r.get("event_key", ""),
                 "energy": r.get("energy"),
                 "stress": r.get("stress"),
@@ -293,19 +308,21 @@ with col2:
 
             if not chart_df.empty:
 
-                chart_df["created_at"] = pd.to_datetime(
-                    chart_df["created_at"]
-                )
+                chart_df["created_at"] = safe_to_datetime(chart_df["created_at"])
+                chart_df = chart_df.dropna(subset=["created_at"])
 
-                chart_df = chart_df.sort_values(
-                    "created_at"
-                )
-
-                st.line_chart(
-                    chart_df.set_index(
+                if chart_df.empty:
+                    st.info(t["no_chart"])
+                else:
+                    chart_df = chart_df.sort_values(
                         "created_at"
-                    )["stress"]
-                )
+                    )
+
+                    st.line_chart(
+                        chart_df.set_index(
+                            "created_at"
+                        )["stress"]
+                    )
 
 st.divider()
 

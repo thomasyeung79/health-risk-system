@@ -5,6 +5,7 @@ from datetime import datetime
 import streamlit as st
 
 from modules.dashboard_insights import build_trend_insights
+from modules.emotion_localization import localize_emotion
 from modules.ui import (
     apply_product_theme,
     render_medical_disclaimer,
@@ -320,7 +321,7 @@ with sc2:
         stress = e.get("stress", "—")
         energy = e.get("energy", "—")
         pattern = e.get("pattern_key", "—")
-        mood = e.get("mood_key", "—")
+        mood = localize_emotion(e.get("mood_key", "—"), language)
         created_e = (e.get("created_at") or "")[:10]
 
         st.markdown(f"""
@@ -336,6 +337,7 @@ with sc2:
             <div style="text-align: right;">
                 <div style="font-size: 13px; color: #667085;">{t["pattern"]}</div>
                 <div style="font-size: 14px; font-weight: 700; color: #172026;">{pattern}</div>
+                <div style="font-size: 12px; color: #667085; margin-top: 4px;">{mood}</div>
             </div>
         </div>
         <div style="font-size: 12px; color: #94a3b8; margin-top: 12px;">

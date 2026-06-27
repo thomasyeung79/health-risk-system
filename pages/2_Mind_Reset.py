@@ -14,6 +14,7 @@ from modules.ui import (
     render_section_label,
     render_topbar,
 )
+from modules.emotion_localization import MOOD_LABELS, localize_emotion
 
 # ── Backend API availability ───────────────────────
 BACKEND_AVAILABLE = False
@@ -138,25 +139,6 @@ TEXT = {
 t = TEXT[language]
 
 
-MOOD_LABELS = {
-    "English": {
-        "Calm": "Calm",
-        "Tired": "Tired",
-        "Anxious": "Anxious",
-        "Low": "Low",
-        "Angry": "Angry",
-        "Numb": "Numb"
-    },
-    "中文": {
-        "Calm": "平静",
-        "Tired": "疲惫",
-        "Anxious": "焦虑",
-        "Low": "低落",
-        "Angry": "生气",
-        "Numb": "麻木"
-    }
-}
-
 EVENT_LABELS = {
     "English": {
         "Nothing special": "Nothing special",
@@ -269,7 +251,7 @@ if st.button(t["generate"], use_container_width=True):
                 language=language,
             )
 
-    mood_display = MOOD_LABELS[language][mood_key]
+    mood_display = localize_emotion(mood_key, language)
     event_display = EVENT_LABELS[language][event_key]
 
     record = {

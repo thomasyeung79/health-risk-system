@@ -14,6 +14,11 @@ import app.models.emotion_record  # noqa: F401
 import app.models.report_record  # noqa: F401
 import app.models.user  # noqa: F401
 import app.models.refresh_token  # noqa: F401
+import app.models.member  # noqa: F401
+import app.models.consultation  # noqa: F401
+import app.models.ai_report  # noqa: F401
+import app.models.healing_plan  # noqa: F401
+import app.models.community_case  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

@@ -3,11 +3,12 @@ from datetime import datetime
 import os
 from io import BytesIO
 import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 import pandas as pd
 
 from database import load_json, filter_user, HEALTH_JSON, MIND_JSON
+from modules.chart_utils import configure_matplotlib_fonts
+from modules.emotion_localization import localize_emotion
 
 try:
     from modules.pdf_report import generate_pdf as generate_pdf_report
@@ -25,12 +26,7 @@ from modules.ui import (
     render_topbar,
 )
 
-matplotlib.rcParams["font.family"] = "sans-serif"
-matplotlib.rcParams["font.sans-serif"] = [
-    "Noto Sans CJK JP",
-    "DejaVu Sans",
-]
-matplotlib.rcParams["axes.unicode_minus"] = False
+configure_matplotlib_fonts()
 
 st.set_page_config(
     page_title="Final Wellness Report",
@@ -88,6 +84,7 @@ TEXT = {
 
         "no_health": "No health record.",
         "no_mind": "No mind reset record.",
+        "no_trend_chart": "Not enough valid trend data to draw a timeline.",
 
         "insight_title": "AI Final Wellness Insight",
 
@@ -142,6 +139,7 @@ TEXT = {
 
         "no_health": "暂无健康记录。",
         "no_mind": "暂无情绪记录。",
+        "no_trend_chart": "暂无足够的有效趋势数据用于绘制时间线。",
 
         "insight_title": "AI综合健康分析",
 
@@ -241,6 +239,58 @@ def as_number(value):
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def safe_to_datetime(values):
+    try:
+        return pd.to_datetime(values, format="mixed", errors="coerce")
+    except (TypeError, ValueError):
+        series = values if isinstance(values, pd.Series) else pd.Series(values)
+        return series.apply(lambda value: pd.to_datetime(value, errors="coerce"))
+
+
+def build_trend_dataframe(history_summary, labels):
+    rows = []
+
+    for item in history_summary["health_series"]:
+        rows.append({
+            "created_at": item.get("created_at"),
+            "series": labels["health_score"],
+            "value": as_number(item.get("health_score")),
+        })
+
+    for item in history_summary["mind_series"]:
+        rows.append({
+            "created_at": item.get("created_at"),
+            "series": labels["stress"],
+            "value": as_number(item.get("stress")),
+        })
+        rows.append({
+            "created_at": item.get("created_at"),
+            "series": labels["energy"],
+            "value": as_number(item.get("energy")),
+        })
+
+    if not rows:
+        return pd.DataFrame()
+
+    trend_df = pd.DataFrame(rows)
+    trend_df["created_at"] = safe_to_datetime(trend_df["created_at"])
+    trend_df["value"] = pd.to_numeric(trend_df["value"], errors="coerce")
+    trend_df = trend_df.dropna(subset=["created_at", "value"])
+
+    if trend_df.empty:
+        return pd.DataFrame()
+
+    return (
+        trend_df.pivot_table(
+            index="created_at",
+            columns="series",
+            values="value",
+            aggfunc="mean",
+        )
+        .sort_index()
+    )
 
 
 def trend_label(start, end, language, higher_is_better=True):
@@ -456,7 +506,13 @@ def generate_local_report(username, health, mind, history_summary, report_style,
             language,
         )
         risk_level = value_or_na(health.get("risk_level") if health else None, language)
-        mood = value_or_na(mind.get("mood") if mind else None, language)
+        mood = value_or_na(
+            localize_emotion(
+                mind.get("mood") or mind.get("mood_key") if mind else None,
+                language,
+            ),
+            language,
+        )
         stress = value_or_na(mind.get("stress") if mind else None, language)
         energy = value_or_na(mind.get("energy") if mind else None, language)
         focus = value_or_na(health.get("primary_focus") if health else None, language)
@@ -498,7 +554,13 @@ def generate_local_report(username, health, mind, history_summary, report_style,
         language,
     )
     risk_level = value_or_na(health.get("risk_level") if health else None, language)
-    mood = value_or_na(mind.get("mood") if mind else None, language)
+    mood = value_or_na(
+        localize_emotion(
+            mind.get("mood") or mind.get("mood_key") if mind else None,
+            language,
+        ),
+        language,
+    )
     stress = value_or_na(mind.get("stress") if mind else None, language)
     energy = value_or_na(mind.get("energy") if mind else None, language)
     focus = value_or_na(health.get("primary_focus") if health else None, language)
@@ -656,9 +718,9 @@ with col2:
 
         st.metric(
             t["mood"],
-            latest_mind.get(
-                "mood",
-                "N/A"
+            localize_emotion(
+                latest_mind.get("mood") or latest_mind.get("mood_key", "N/A"),
+                language,
             )
         )
 
@@ -711,33 +773,12 @@ i4.metric(
     value_or_na(history_summary["average_energy"], language)
 )
 
-trend_rows = []
-
-for item in history_summary["health_series"]:
-    trend_rows.append({
-        "created_at": item["created_at"],
-        t["health_score"]: item["health_score"],
-    })
-
-for item in history_summary["mind_series"]:
-    trend_rows.append({
-        "created_at": item["created_at"],
-        t["stress"]: item["stress"],
-        t["energy"]: item["energy"],
-    })
-
-if trend_rows:
-    render_section_label(t["trend_chart"])
-    trend_df = pd.DataFrame(trend_rows)
-    trend_df["created_at"] = pd.to_datetime(
-        trend_df["created_at"],
-        errors="coerce",
-    )
-    trend_df = trend_df.dropna(subset=["created_at"]).sort_values("created_at")
-
-    if not trend_df.empty:
-        trend_df = trend_df.groupby("created_at").first()
-        st.line_chart(trend_df, use_container_width=True)
+render_section_label(t["trend_chart"])
+trend_df = build_trend_dataframe(history_summary, t)
+if trend_df.empty or trend_df.dropna(how="all").empty:
+    st.info(t["no_trend_chart"])
+else:
+    st.line_chart(trend_df, use_container_width=True)
 
 st.divider()
 

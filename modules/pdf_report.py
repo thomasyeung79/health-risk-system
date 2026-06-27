@@ -20,6 +20,8 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from modules.emotion_localization import localize_emotion
+
 CJK_FONT_NAME = "Helvetica"
 
 
@@ -154,7 +156,10 @@ def generate_pdf(
         elements.append(Paragraph(
             "Emotional State" if not is_cn else "情绪状态", _section_style(),
         ))
-        mood = latest_mind.get("mood") or latest_mind.get("mood_key", "—")
+        mood = localize_emotion(
+            latest_mind.get("mood") or latest_mind.get("mood_key", "—"),
+            language,
+        )
         stress = latest_mind.get("stress", "—")
         energy = latest_mind.get("energy", "—")
         pattern = latest_mind.get("pattern_key", "—")
