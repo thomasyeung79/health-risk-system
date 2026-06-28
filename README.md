@@ -12,36 +12,40 @@
 [![Tests](https://img.shields.io/badge/tests-202%20passing-brightgreen.svg)](#testing)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED.svg?logo=docker)](docker-compose.yml)
 
+## Live Demo
+
+**Try AI Wellness OS online:** [https://ai-wellness.streamlit.app](https://ai-wellness.streamlit.app)
+
 ---
 
 ```mermaid
 graph TB
-    User[User Browser] --> Frontend[Streamlit Frontend :8501]
-    Frontend --> APIClient[api_client/ — 9 typed clients]
-    APIClient -->|HTTP REST + JWT| Backend[FastAPI Backend :8000]
+    User[User Browser] --> Frontend[Streamlit Frontend port 8502]
+    Frontend --> APIClient[API client layer with typed clients]
+    APIClient -->|HTTP REST and JWT| Backend[FastAPI Backend port 8000]
 
-    subgraph Backend [FastAPI Backend]
+    subgraph BackendLayer [FastAPI Backend]
         direction TB
-        API[api/ — 25+ endpoints]
-        Services[services/ — orchestration]
-        Engines[engines/ — 9 assessment modules]
-        Models[models/ — 11 ORM tables]
+        API[API route modules]
+        Services[Service orchestration]
+        Engines[Assessment engines]
+        Models[ORM data models]
         API --> Services --> Engines --> Models
     end
 
-    Backend --> DB[(SQLite — 11 tables)]
-    Backend --> AI[DeepSeek / Local AI]
+    Backend --> DB[(SQLite database)]
+    Backend --> AI[DeepSeek and Local AI]
 
-    subgraph Wellness OS [Wellness OS Modules]
-        M1[👥 Member Management]
-        M2[📋 Consultations]
-        M3[📊 AI Reports]
-        M4[🎯 Healing Plans]
-        M5[📂 Community Cases]
-        M6[📈 Dashboard Analytics]
+    subgraph WellnessModules [Wellness OS Modules]
+        M1[Member Management]
+        M2[Consultations]
+        M3[AI Reports]
+        M4[Healing Plans]
+        M5[Community Cases]
+        M6[Dashboard Analytics]
     end
 
-    Backend --- Wellness OS
+    Backend --- WellnessModules
 
     style User fill:#e8f5e9,stroke:#2e7d32
     style Frontend fill:#e3f2fd,stroke:#1565c0
@@ -88,12 +92,17 @@ graph TB
 
 ## Screenshots
 
-> Screenshots below are placeholders. Run the application locally or check `docs/screenshots/` for the most recent captures.
+These screenshots are committed in `docs/screenshots/` and reflect the current Streamlit product flow.
 
-![Dashboard](docs/screenshots/06-dashboard.png)
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-![Members](docs/screenshots/admin-members.png)
-![AI Reports](docs/screenshots/admin-ai-reports.png)
+| Screen | Preview |
+|--------|---------|
+| Login | ![Login screen](docs/screenshots/01-login.png) |
+| Health Check | ![Health check screen](docs/screenshots/02-health-check.png) |
+| Emotion Analysis | ![Emotion analysis screen](docs/screenshots/03-emotion-analysis.png) |
+| Final Report | ![Final report screen](docs/screenshots/04-final-report.png) |
+| Trend Analysis | ![Trend analysis screen](docs/screenshots/05-trend-analysis.png) |
+| Dashboard | ![Dashboard screen](docs/screenshots/06-dashboard.png) |
+| AI Coach | ![AI coach screen](docs/screenshots/07-ai-coach.png) |
 
 ---
 
@@ -120,7 +129,7 @@ uvicorn app.main:app --reload --port 8000
 # Terminal 2 — Frontend
 cd AI_Wellness_Platform
 pip install -r requirements.txt
-streamlit run web_v1.py --server.port 8501
+streamlit run web_v1.py --server.port 8502
 ```
 
 ### Docker (Recommended)
@@ -135,7 +144,7 @@ Open in browser:
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:8501 |
+| Frontend | http://localhost:8502 |
 | Backend API | http://localhost:8000 |
 | API Docs | http://localhost:8000/docs |
 
