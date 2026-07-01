@@ -136,7 +136,7 @@ The AI Wellness Platform is a **two-tier, API-first** application consisting of 
 
 ## 3. Request Flow
 
-### Health Check Example
+### Health Assessment Example
 
 ```
 User fills form → clicks "Generate"

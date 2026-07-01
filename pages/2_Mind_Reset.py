@@ -43,7 +43,7 @@ except Exception:
 
 
 st.set_page_config(
-    page_title="Mind Reset",
+    page_title="Reflection",
     page_icon="W",
     layout="wide"
 )
@@ -58,7 +58,7 @@ require_user(language)
 
 TEXT = {
     "English": {
-        "title": "Mind Reset",
+        "title": "Reflection",
         "subtitle": "Turn mood, stress, and energy signals into a clear emotional reset plan.",
         "intro": "Check your mood, stress, energy, and receive structured guidance.",
 
@@ -93,11 +93,11 @@ TEXT = {
         "energy_metric": "Energy",
         "stress_metric": "Stress",
 
-        "footer": "AI Wellness Platform | Mind Reset Module"
+        "footer": "AI Wellness Platform | Reflection Module"
     },
 
     "中文": {
-        "title": "情绪重整",
+        "title": "反思",
         "subtitle": "把情绪、压力和能量状态转化为清晰的自我重整计划。",
         "intro": "记录你的情绪、压力和能量状态，获得结构化引导。",
 

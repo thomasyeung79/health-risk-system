@@ -73,3 +73,41 @@ class AdminClient:
 
     def create_community_case(self, **data) -> dict[str, Any]:
         return self._client.post("/api/v1/community-cases", json=data)
+
+    # ── Growth Journeys ───────────────────────────────
+    def list_growth_journeys(self, member_id: int | None = None, limit=50, offset=0) -> dict[str, Any]:
+        params: dict[str, Any] = {"limit": limit, "offset": offset}
+        if member_id is not None:
+            params["member_id"] = member_id
+        return self._client.get("/api/v1/growth-journeys", params=params)
+
+    def get_growth_journey(self, journey_id: int) -> dict[str, Any]:
+        return self._client.get(f"/api/v1/growth-journeys/{journey_id}")
+
+    def generate_growth_journey(self, member_id: int) -> dict[str, Any]:
+        return self._client.post("/api/v1/growth-journeys/generate", json={"member_id": member_id})
+
+    # ── Pattern Discovery ──────────────────────────────
+    def get_patterns(self, member_id: int) -> dict[str, Any]:
+        return self._client.get(f"/api/v1/patterns/{member_id}")
+
+    # ── Insights Dashboard ─────────────────────────────
+    def get_insights(self, member_id: int) -> dict[str, Any]:
+        return self._client.get(f"/api/v1/insights/{member_id}")
+
+    # ── AI Coach ───────────────────────────────────────
+    def get_daily_coaching(self, member_id: int) -> dict[str, Any]:
+        return self._client.get(f"/api/v1/coach/daily/{member_id}")
+
+    # ── Daily Reflections ──────────────────────────────
+    def list_reflections(self, member_id: int | None = None, limit=50, offset=0) -> dict[str, Any]:
+        params: dict[str, Any] = {"limit": limit, "offset": offset}
+        if member_id is not None:
+            params["member_id"] = member_id
+        return self._client.get("/api/v1/reflections", params=params)
+
+    def create_reflection(self, **data) -> dict[str, Any]:
+        return self._client.post("/api/v1/reflections", json=data)
+
+    def get_weekly_reflection_summary(self, member_id: int) -> dict[str, Any]:
+        return self._client.get(f"/api/v1/reflections/weekly-summary/{member_id}")

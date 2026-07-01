@@ -29,7 +29,7 @@ from modules.ui import (
 configure_matplotlib_fonts()
 
 st.set_page_config(
-    page_title="Final Wellness Report",
+    page_title="Insights Report",
     page_icon="W",
     layout="wide"
 )
@@ -46,18 +46,18 @@ TEXT = {
         "title": "Final Wellness Report",
         "subtitle": "Combine your latest physical and emotional records into one practical wellness plan.",
 
-        "generate": "Generate Final AI Report",
+        "generate": "Generate Insights Report",
         "loading": "Generating combined wellness insight...",
         "ai_error": "AI report generation is unavailable. Please check your OpenAI API key and try again.",
         "fallback_notice": "AI generation is unavailable, so a local summary was generated instead.",
         "download": "Download Report",
         "download_pdf": "Export PDF",
 
-        "no_data": "No health or mind records found for this user.",
+        "no_data": "No health assessment or reflection records found for this user.",
 
         "health_snapshot": "Health Snapshot",
         "mind_snapshot": "Mind Snapshot",
-        "history_snapshot": "History Trend",
+        "history_snapshot": "Wellness History Trend",
         "intelligence_snapshot": "Wellness Intelligence",
         "trend_chart": "Trend Timeline",
         "report_style": "Report Style",
@@ -83,7 +83,7 @@ TEXT = {
         "stress": "Stress",
 
         "no_health": "No health record.",
-        "no_mind": "No mind reset record.",
+        "no_mind": "No reflection record.",
         "no_trend_chart": "Not enough valid trend data to draw a timeline.",
 
         "insight_title": "AI Final Wellness Insight",
@@ -94,7 +94,7 @@ TEXT = {
 
         "back": "Back to Home",
 
-        "footer": "AI Wellness Platform | Final Report Module"
+        "footer": "AI Wellness Platform | Insights Report Module"
     },
 
     "中文": {
@@ -445,7 +445,7 @@ Report language: {report_language}
 Latest physical health data:
 {health}
 
-Latest emotional / mind reset data:
+Latest emotional reflection data:
 {mind}
 
 Historical wellness trend summary:
@@ -586,7 +586,7 @@ def generate_local_report(username, health, mind, history_summary, report_style,
 - Average energy: {value_or_na(history_summary["average_energy"], language)}
 
 ## Integrated Reading
-{focus if focus != "N/A" else "There is not enough complete data yet. Complete one health check and one mind reset to make the report more useful."}
+{focus if focus != "N/A" else "There is not enough complete data yet. Complete one Health Assessment and one Reflection to make the report more useful."}
 
 Physical health, stress, sleep, movement, and screen habits usually influence each other. If health score is declining while stress is rising, recovery, stress management, and daily movement should be treated as the first priorities.
 

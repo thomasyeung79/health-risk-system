@@ -20,24 +20,22 @@ BRAND_NAME = {
 
 NAV_ITEMS = {
     "English": [
-        ("Home", "web_v1.py"),
-        ("Dashboard", "pages/0_Dashboard.py"),
-        ("AI Coach", "pages/5_AI_Coach.py"),
-        ("Health Check", "pages/1_Health_Check.py"),
-        ("Mind Reset", "pages/2_Mind_Reset.py"),
-        ("History", "pages/3_Wellness_History.py"),
-        ("Final Report", "pages/4_Final_Report.py"),
-        ("Wellness OS", "pages/7_Admin.py"),
+        ("🏠 Dashboard", "pages/0_Dashboard.py"),
+        ("👤 Health Assessment", "pages/1_Health_Check.py"),
+        ("💭 Reflection", "pages/2_Mind_Reset.py"),
+        ("📈 Wellness History", "pages/3_Wellness_History.py"),
+        ("📋 Insights Report", "pages/4_Final_Report.py"),
+        ("🤖 AI Coach", "pages/5_AI_Coach.py"),
+        ("⚙ Administration", "pages/7_Admin.py"),
     ],
     "中文": [
-        ("首页", "web_v1.py"),
-        ("看板", "pages/0_Dashboard.py"),
-        ("AI 教练", "pages/5_AI_Coach.py"),
-        ("健康检测", "pages/1_Health_Check.py"),
-        ("情绪重整", "pages/2_Mind_Reset.py"),
-        ("历史记录", "pages/3_Wellness_History.py"),
-        ("综合报告", "pages/4_Final_Report.py"),
-        ("管理中心", "pages/7_Admin.py"),
+        ("🏠 看板", "pages/0_Dashboard.py"),
+        ("👤 健康评估", "pages/1_Health_Check.py"),
+        ("💭 反思", "pages/2_Mind_Reset.py"),
+        ("📈 健康历程", "pages/3_Wellness_History.py"),
+        ("📋 洞察报告", "pages/4_Final_Report.py"),
+        ("🤖 AI 教练", "pages/5_AI_Coach.py"),
+        ("⚙ 管理", "pages/7_Admin.py"),
     ],
 }
 
@@ -504,6 +502,376 @@ textarea {
         padding: 12px;
     }
 }
+
+/* ── Design System Components ──────────────────────── */
+
+.section-head {
+    margin: 8px 0 16px;
+}
+.section-title {
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 850;
+    margin: 0;
+}
+.section-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Metric Card */
+.metric-card {
+    text-align: center;
+    padding: 20px 16px;
+    border-top: 4px solid var(--brand);
+}
+.metric-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+.metric-label {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.metric-value {
+    color: var(--ink);
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+.metric-delta {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.delta-up {
+    color: #15803d;
+    background: #dcfce7;
+}
+.delta-down {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+/* Insight Card */
+.insight-card {
+    display: flex;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--brand);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 8px 0;
+    box-shadow: 0 4px 16px rgba(15,23,42,0.04);
+}
+.insight-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+.insight-content strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+.insight-content p {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Achievement Card */
+.achievement-card {
+    display: flex;
+    gap: 14px;
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 6px 0;
+}
+.achievement-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+}
+.achievement-body strong {
+    color: #166534;
+    display: block;
+    margin-bottom: 2px;
+}
+.achievement-body p {
+    color: #15803d;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Risk Badge */
+.risk-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Timeline */
+.timeline-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 32px;
+}
+.timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--brand);
+    border: 2px solid #ccfbf1;
+    flex-shrink: 0;
+}
+.timeline-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(180deg, var(--brand) 0%, transparent 100%);
+    min-height: 20px;
+}
+.timeline-item {
+    display: flex;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 4px 0;
+    transition: 120ms ease;
+}
+.timeline-item:hover {
+    border-color: var(--brand);
+    box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+}
+.timeline-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0fdfa;
+    border-radius: 8px;
+}
+.timeline-date {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.timeline-title {
+    color: var(--ink);
+    font-weight: 750;
+    font-size: 15px;
+}
+.timeline-desc {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Pattern Card */
+.pattern-card {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    margin: 8px 0;
+}
+.pattern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.pattern-header strong {
+    color: var(--ink);
+    font-size: 15px;
+}
+.pattern-confidence {
+    font-weight: 800;
+    font-size: 15px;
+}
+.pattern-bar-bg {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+.pattern-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+.pattern-evidence {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+.pattern-rec {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Coach Card */
+.coach-card {
+    background: linear-gradient(135deg, #f0f9ff, #f5f3ff);
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 22px;
+    margin: 8px 0;
+}
+.coach-date {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.coach-title {
+    color: var(--ink);
+    font-size: 20px;
+    font-weight: 850;
+    margin-bottom: 14px;
+}
+.coach-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.coach-line {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: #ffffff;
+    border: 2px dashed var(--line);
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+.empty-title {
+    color: var(--ink);
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+.empty-desc {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+}
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--line);
+    border-top: 3px solid var(--brand);
+    border-radius: 999px;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+    font-size: 14px;
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: 32px 24px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.error-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+.error-title {
+    color: #991b1b;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+.error-message {
+    color: #b91c1c;
+    font-size: 14px;
+}
+.error-detail {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* Top nav tabs */
+.product-nav .stButton button {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 14px;
+    min-height: 36px;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.product-nav .stButton button:hover {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+}
+
+/* Workspace tabs */
+.workspace-tab {
+    padding: 4px 0;
+}
+
+/* Two-column insight grid */
+.insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+@media (max-width: 760px) {
+    .insight-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
         """,
         unsafe_allow_html=True,
@@ -822,6 +1190,208 @@ def render_panel(title, body=None):
 <div class="insight-panel">
     <h3>{escape(title)}</h3>
     {body_html}
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Design System — Product Components
+# ═══════════════════════════════════════════════════════════════════
+
+def render_section(title, subtitle=None):
+    """Standard section header used across all pages."""
+    sub = f'<div class="section-sub">{escape(subtitle)}</div>' if subtitle else ""
+    st.markdown(
+        f"""
+<div class="section-head">
+    <h2 class="section-title">{escape(title)}</h2>
+    {sub}
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_metric_card(icon, label, value, delta=None, color=None):
+    """Product metric card with optional delta indicator."""
+    delta_html = ""
+    if delta is not None:
+        arrow = "↑" if delta >= 0 else "↓"
+        delta_cls = "delta-up" if delta >= 0 else "delta-down"
+        delta_html = f'<span class="metric-delta {delta_cls}">{arrow} {abs(delta)}%</span>'
+    accent = color or "var(--brand)"
+    st.markdown(
+        f"""
+<div class="product-card metric-card" style="border-top-color: {accent};">
+    <div class="metric-icon">{icon}</div>
+    <div class="metric-label">{escape(label)}</div>
+    <div class="metric-value">{escape(str(value))}</div>
+    {delta_html}
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_insight_card(title, body, icon="💡", color="var(--brand)"):
+    """Insight card with icon and gradient accent."""
+    st.markdown(
+        f"""
+<div class="insight-card" style="border-left-color: {color};">
+    <div class="insight-icon">{icon}</div>
+    <div class="insight-content">
+        <strong>{escape(title)}</strong>
+        <p>{escape(body)}</p>
+    </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_achievement_card(title, body, icon="🏆"):
+    """Achievement card for positive milestones."""
+    st.markdown(
+        f"""
+<div class="achievement-card">
+    <div class="achievement-icon">{icon}</div>
+    <div class="achievement-body">
+        <strong>{escape(title)}</strong>
+        <p>{escape(body)}</p>
+    </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_risk_badge(level):
+    """Coloured risk badge — Low/Medium/High with appropriate colours."""
+    colors = {"Low": "#15803d", "Medium": "#b45309", "High": "#b91c1c"}
+    if level in ("低",):
+        level, colors["低"] = "Low", "#15803d"
+    elif level in ("中",):
+        level, colors["中"] = "Medium", "#b45309"
+    elif level in ("高",):
+        level, colors["高"] = "High", "#b91c1c"
+    bg = colors.get(level, "#6b7280")
+    return f'<span class="risk-badge" style="background:{bg}20;color:{bg};border:1px solid {bg}40;">{escape(level)}</span>'
+
+
+def render_timeline_connector():
+    """Vertical connector line between timeline items."""
+    st.markdown(
+        """
+<div class="timeline-connector">
+    <div class="timeline-dot"></div>
+    <div class="timeline-line"></div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_timeline_item(icon, date, title, description, event_type="default"):
+    """A single visual timeline entry with icon, date, and description."""
+    st.markdown(
+        f"""
+<div class="timeline-item {event_type}">
+    <div class="timeline-icon">{icon}</div>
+    <div class="timeline-body">
+        <div class="timeline-date">{escape(date[:10]) if date else ""}</div>
+        <div class="timeline-title">{escape(title)}</div>
+        <div class="timeline-desc">{escape(description[:200]) if description else ""}</div>
+    </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_pattern_card(title, confidence, evidence, recommendation):
+    """Pattern discovery result card with confidence meter."""
+    pct = int(confidence * 100)
+    bar_color = "#15803d" if confidence >= 0.7 else "#b45309" if confidence >= 0.4 else "#6b7280"
+    st.markdown(
+        f"""
+<div class="pattern-card">
+    <div class="pattern-header">
+        <strong>{escape(title)}</strong>
+        <span class="pattern-confidence" style="color:{bar_color};">{pct}%</span>
+    </div>
+    <div class="pattern-bar-bg">
+        <div class="pattern-bar-fill" style="width:{pct}%;background:{bar_color};"></div>
+    </div>
+    <div class="pattern-evidence">{escape(evidence)}</div>
+    <div class="pattern-rec">💡 {escape(recommendation)}</div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_coach_card(date, title, content_lines):
+    """AI Coach daily message card."""
+    lines_html = "".join(
+        f'<div class="coach-line">{escape(line)}</div>'
+        for line in content_lines
+    )
+    st.markdown(
+        f"""
+<div class="coach-card">
+    <div class="coach-date">{escape(date)}</div>
+    <div class="coach-title">{escape(title)}</div>
+    <div class="coach-lines">{lines_html}</div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_empty_state(icon, title, description, action_label=None, action_key=None):
+    """Beautiful empty state with optional action button."""
+    btn = ""
+    if action_label and action_key:
+        if st.button(action_label, key=action_key, use_container_width=True):
+            return True
+    st.markdown(
+        f"""
+<div class="empty-state">
+    <div class="empty-icon">{icon}</div>
+    <div class="empty-title">{escape(title)}</div>
+    <div class="empty-desc">{escape(description)}</div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    return False
+
+
+def render_loading_state(message="Loading..."):
+    """Standard loading placeholder."""
+    st.markdown(
+        f"""
+<div class="loading-state">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">{escape(message)}</div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_error_state(message, details=None):
+    """Standard error state with optional details."""
+    detail_html = f'<div class="error-detail">{escape(details)}</div>' if details else ""
+    st.markdown(
+        f"""
+<div class="error-state">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Something went wrong</div>
+    <div class="error-message">{escape(message)}</div>
+    {detail_html}
 </div>
         """,
         unsafe_allow_html=True,

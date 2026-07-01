@@ -50,7 +50,7 @@ except Exception:
     pass
 
 st.set_page_config(
-    page_title="Health Check",
+    page_title="Health Assessment",
     page_icon="W",
     layout="wide"
 )
@@ -67,7 +67,7 @@ TEXT = {
 
     "English": {
 
-        "title": "Health Check",
+        "title": "Health Assessment",
         "subtitle": "Capture today’s core lifestyle signals and turn them into a risk-aware health snapshot.",
         "intro": "Assess your BMI, hydration, sleep, activity, diet, habits, and mental wellness.",
 
@@ -114,7 +114,7 @@ TEXT = {
         "reasons": "Reasons",
         "suggestions": "Suggestions",
 
-        "footer": "AI Wellness Platform | Health Module",
+        "footer": "AI Wellness Platform | Health Assessment Module",
 
         "healthy": "Healthy",
         "low_risk": "Low Risk",
@@ -131,7 +131,7 @@ TEXT = {
         "habit_module": "Habit",
 
         "back": "Back to Home",
-        "next": "Next: Mind Reset"
+        "next": "Next: Reflection"
     },
 
     "中文": {

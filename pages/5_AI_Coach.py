@@ -156,7 +156,7 @@ def generate_response(question: str, context: dict, compressed_history: str) -> 
     if not has_data:
         if is_cn:
             return _append_memory_to_situation({"situation": "暂无健康或情绪数据。", "strengths": [], "concerns": [], "actions": ["请先完成健康检测和情绪分析。"], "goal": "完成首次检测。"}, compressed_history)
-        return _append_memory_to_situation({"situation": "No health or emotion data available.", "strengths": [], "concerns": [], "actions": ["Complete a Health Check and Mind Reset first."], "goal": "Complete your first assessment."}, compressed_history)
+        return _append_memory_to_situation({"situation": "No health or emotion data available.", "strengths": [], "concerns": [], "actions": ["Complete a Health Assessment and Reflection first."], "goal": "Complete your first assessment."}, compressed_history)
 
     # Try DeepSeek via report API
     if BACKEND_AVAILABLE:

@@ -5,33 +5,59 @@ All notable changes to AI Wellness Platform are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses semantic versioning for portfolio releases.
 
-## [0.3.0] — 2026-06-27 — AI Wellness OS
+## [0.4.0] — 2026-06-29 — AI Provider + Growth Journey
 
 ### Added
-- **Wellness OS backend**: 6 new API modules with 11+ new endpoints
-- **Admin Dashboard**: Professional sidebar navigation with KPI metric cards
-- **Member Management**: Full CRUD for wellness members with multilingual profiles (EN / Chinese / Korean)
-- **Consultation Management**: Session tracking with type, concern, and questionnaire data
-- **AI Report Generation**: Deterministic rule-based reports per member (OpenAI/DeepSeek ready)
-- **Healing Plans**: Structured wellness plans with progress status tracking
-- **Community Cases**: Anonymised case studies with public/private publishing
-- **Demo Data Generator**: One-command seeding with 30+ members, 300 health records, 80 consultations, 60 AI reports, 40 healing plans, 50 community cases
-- **Reusable admin UI components** (`modules/admin_ui.py`)
-- **Admin API client** (`api_client/admin_client.py`)
-- **Emotion localization module** for multilingual label support
-- **Chart utilities** for CJK font rendering
-- **Alembic migration 005** with 5 new database tables
-- **17 new tests** covering all Wellness OS endpoints
-- **CONTRIBUTING.md** and **RELEASE_NOTES_v0.3.md**
+- **AI Provider System**: Pluggable provider layer with abstract interface
+  - `RuleBasedProvider` — deterministic default fallback (preserves existing behavior)
+  - `OpenAIProvider` — placeholder for future OpenAI integration
+  - `DeepSeekProvider` — placeholder for future DeepSeek integration
+  - Provider selection via `AI_PROVIDER=rule_based|openai|deepseek` env var
+  - Safe fallback to rule_based when API key is missing
+  - Factory function `create_ai_provider()` in `app/services/ai_providers.py`
+- **Growth Journey Module**: Timeline-style personal wellness growth story
+  - New `growth_journeys` database table (id, member_id, title, summary, timeline_items, insights)
+  - Rule-based generation combining health records, emotion records, consultations, AI reports, and healing plans
+  - Timeline events, emotional patterns, key challenges, healing actions, progress summary, next-step suggestions
+  - 3 new API endpoints: POST `/growth-journeys/generate`, GET `/growth-journeys` (filterable by member_id), GET `/growth-journeys/{id}`
+  - Administration Dashboard section with member input, generation, timeline view, insights, and next steps
+- **25 new tests** covering:
+  - AI provider factory fallback (env var absent, missing key, unknown provider)
+  - RuleBasedProvider content generation (EN/CN, risk levels, age defaults)
+  - OpenAI/DeepSeek placeholder providers
+  - Growth Journey generation, list, detail, user isolation
 
 ### Changed
-- Updated README with Mermaid architecture diagram and Wellness OS branding
-- Router registration expanded from 6 to 11 route modules
-- Enhanced datetime parsing robustness in trend charts
+- Refactored `ai_report_service.py` to use the pluggable `AIProvider` interface
+- Router registration expanded from 11 to 12 route modules (added growth_journeys)
+- Administration dashboard now includes "Growth Journey" in sidebar navigation
+- Updated README with v0.4 features, revised API table, and roadmap
 
 ### Preserved
-- All 185 existing tests remain unchanged
+- All existing tests remain unchanged
 - No breaking changes to existing APIs
+- Rule-based provider produces identical output to previous hardcoded logic
+
+## [0.5.0] — 2026-07-01 — Product Intelligence Upgrade
+
+### Added
+- **Pattern Discovery Engine** — automatically discovers behaviour patterns from health and emotion records (sleep→stress, exercise→energy, health trajectory, emotional stability, diet→energy). Confidence scoring, evidence summaries, recommendations. API: `GET /api/v1/patterns/{member_id}`
+- **Insights Dashboard** — Today's Wellness Score, Monthly Trend, Positive Changes, Risk Alerts, Recommended Focus, Recent Achievements. Meaningful narrative summaries instead of raw numbers. API: `GET /api/v1/insights/{member_id}`
+- **AI Coach** — generates one daily coaching message per member (not a chatbot). Includes today's focus, habit suggestion, motivation, wellness reminder. Seeded RNG for deterministic daily output. API: `GET /api/v1/coach/daily/{member_id}`
+- **Daily Reflection** — new `daily_reflections` table with went_well, biggest_challenge, gratitude, notes fields. Weekly summary generation with keyword theme extraction. APIs: `POST /api/v1/reflections`, `GET /api/v1/reflections`, `GET /api/v1/reflections/weekly-summary/{member_id}`
+- **Wellness Timeline upgrade** — Growth Journey now includes reflection events, narrative milestones between event type transitions, richer story-like descriptions, and improved bilingual flow
+- **21 new tests** covering all 5 modules: pattern discovery (empty, with data, 404, auth), insights (empty, with data, 404, auth), coach (daily message, determinism, 404, auth), reflections (create/list/summary, 404, auth)
+
+### Changed
+- Router registration expanded from 12 to 16 route modules (patterns, insights, coach, reflections)
+- Administration Dashboard sidebar now includes "Insights" page with 4 tabs (Insights, Patterns, Coach, Reflections)
+- Growth Journey service upgraded to include reflections and narrative milestones
+- API client extended with 6 new methods for pattern discovery, insights, coach, and reflections
+
+### Preserved
+- All 231 existing tests unchanged
+- No breaking changes to existing APIs
+- All rule-based — no external API calls during tests
 
 ## [1.0.0-rc.3] - 2026-06-21
 

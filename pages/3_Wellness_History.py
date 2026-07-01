@@ -121,26 +121,26 @@ TEXT = {
         "subtitle": "Review health and emotional records as a single longitudinal wellness timeline.",
 
         "health": "Health Records",
-        "mind": "Mind Reset Records",
+        "mind": "Reflection Records",
 
         "no_health": "No health records found.",
-        "no_mind": "No mind reset records found.",
+        "no_mind": "No reflection records found.",
         "no_chart": "Not enough valid dated records to draw this chart.",
 
-        "summary": "History Summary",
+        "summary": "Wellness History Summary",
 
         "health_records": "Health Records",
-        "mind_records": "Mind Records",
+        "mind_records": "Reflection Records",
         "total_records": "Total Records",
 
         "back": "Back to Home",
 
-        "footer": "AI Wellness Platform | History Module"
+        "footer": "AI Wellness Platform | Wellness History Module"
     },
 
     "中文": {
-        "title": "历史记录",
-        "subtitle": "用同一条时间线查看身体健康与情绪重整记录。",
+        "title": "健康历程",
+        "subtitle": "用同一条时间线查看身体健康与反思记录。",
 
         "health": "健康记录",
         "mind": "情绪记录",
@@ -149,7 +149,7 @@ TEXT = {
         "no_mind": "暂无情绪记录。",
         "no_chart": "暂无足够的有效日期记录用于绘制图表。",
 
-        "summary": "历史总结",
+        "summary": "健康历程总结",
 
         "health_records": "健康记录数",
         "mind_records": "情绪记录数",
@@ -157,7 +157,7 @@ TEXT = {
 
         "back": "返回首页",
 
-        "footer": "AI健康与情绪系统 | 历史模块"
+        "footer": "AI健康与情绪系统 | 健康历程模块"
     }
 }
 
@@ -363,7 +363,7 @@ if mind_records:
     import json
     mind_json = json.dumps(mind_records, ensure_ascii=False, indent=2)
     st.download_button(
-        "Download Mind Records (JSON)" if language == "English" else "下载情绪记录（JSON）",
+        "Download Reflection Records (JSON)" if language == "English" else "下载反思记录（JSON）",
         data=mind_json,
         file_name=f"mind_{user_name}.json",
         mime="application/json",
@@ -374,5 +374,5 @@ st.divider()
 
 st.caption(t["footer"])
 
-if st.button("Next: Final Report" if language == "English" else "下一步：综合报告"):
+if st.button("Next: Insights Report" if language == "English" else "下一步：洞察报告"):
     st.switch_page("pages/4_Final_Report.py")

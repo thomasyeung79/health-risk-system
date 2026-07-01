@@ -216,10 +216,10 @@ ls -la backups/
 - [ ] `https://api.wellness.thomasyeung.dev/health` returns 200
 - [ ] Register a new account works
 - [ ] Login works and JWT tokens are returned
-- [ ] Health Check form submits successfully
+- [ ] Health Assessment form submits successfully
 - [ ] Emotion Analysis generates results
-- [ ] History page shows records
-- [ ] Final Report generates (with DeepSeek or local fallback)
+- [ ] Wellness History page shows records
+- [ ] Insights Report generates (with DeepSeek or local fallback)
 - [ ] Logout works (refresh token revoked)
 - [ ] Mobile browser renders correctly
 - [ ] SSL certificate is valid (`curl -vI https://...` returns no errors)

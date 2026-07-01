@@ -3,7 +3,7 @@
 > **AI Wellness OS** is a bilingual (English / 中文) wellness management platform built for consultants, community health workers, and individuals who want to track health, analyse emotions, generate AI reports, and manage healing plans — all in one place.
 
 [![Backend CI](https://github.com/thomasyeung79/health-risk-system/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/thomasyeung79/health-risk-system/actions/workflows/backend-ci.yml)
-[![Version](https://img.shields.io/badge/version-v0.3--demo-blueviolet.svg)](RELEASE_NOTES_v0.3.md)
+[![Version](https://img.shields.io/badge/version-v0.5--demo-blueviolet.svg)](CHANGELOG.md)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.136+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.38+-FF4B4B.svg?logo=streamlit)](https://streamlit.io/)
@@ -54,6 +54,27 @@ graph TB
     style AI fill:#e8eaf6,stroke:#283593
 ```
 
+### v0.5 — Product Intelligence Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Wellness Intelligence Layer                  │
+├─────────────────┬─────────────────┬─────────────────────────┤
+│  Pattern        │   Insights      │     AI Coach            │
+│  Discovery      │   Dashboard     │     Daily Message       │
+│  Engine         │   - Score       │     - Focus             │
+│  - Sleep/Stress │   - Trends      │     - Habit             │
+│  - Exercise/    │   - Changes     │     - Motivation        │
+│    Energy       │   - Alerts      │     - Reminder          │
+│  - Stability    │   - Focus       │                         │
+│  - Diet/Energy  │   - Achievements│     Daily Reflection    │
+│                 │                 │     - Went Well         │
+│                 │                 │     - Challenge         │
+│                 │                 │     - Gratitude         │
+│                 │                 │     - Weekly Summary    │
+└─────────────────┴─────────────────┴─────────────────────────┘
+```
+
 ---
 
 ## Features
@@ -62,12 +83,17 @@ graph TB
 |--------|-------------|--------|
 | **🧠 Health Assessment** | 8-module health check (BMI, sleep, activity, diet, screen, stress, habits, mental) | ✅ Complete |
 | **💭 Emotion Analysis** | 7-pattern emotion tracking with breathing exercises and reflection guidance | ✅ Complete |
-| **📊 AI Reports** | Deterministic AI report generation — ready for OpenAI/DeepSeek integration | ✅ Complete |
+| **📊 AI Reports** | Pluggable AI provider layer — RuleBased (default), OpenAI, DeepSeek | ✅ Complete |
 | **📈 Trend Analysis** | 4-metric trend tracking with direction detection (improving/stable/declining) | ✅ Complete |
 | **👥 Member Management** | Full CRUD for wellness members with multilingual profiles | ✅ Complete |
 | **📋 Consultations** | Session tracking with type, concern, and questionnaire support | ✅ Complete |
 | **🎯 Healing Plans** | Structured wellness plans with progress tracking and status management | ✅ Complete |
 | **📂 Community Cases** | Anonymised case studies with public/private publishing | ✅ Complete |
+| **🌱 Growth Journey** | Timeline-style personal wellness growth story combining health, emotion, consultations, reports, and plans | ✅ Complete |
+| **🔄 Pattern Discovery** | Automatic behaviour pattern detection (sleep→stress, exercise→energy, health trajectory, emotional stability, diet→energy) | ✅ Complete |
+| **📊 Insights Dashboard** | Wellness score, monthly trends, positive changes, risk alerts, recommended focus, achievements | ✅ Complete |
+| **🎯 AI Coach** | Daily coaching messages with focus topic, habit suggestion, motivation, and wellness reminder | ✅ Complete |
+| **📝 Daily Reflection** | Personal reflection entries with weekly summary generation and theme extraction | ✅ Complete |
 | **🔐 Authentication** | JWT with bcrypt, refresh token rotation, and user-level data isolation | ✅ Complete |
 | **🌐 Bilingual** | Full English and Chinese (中文) interface support | ✅ Complete |
 | **🐳 Docker** | Docker Compose — one command to run the entire system | ✅ Complete |
@@ -83,8 +109,8 @@ graph TB
 | **Frontend** | Streamlit 1.38+ / Pandas / Matplotlib |
 | **Database** | SQLite (dev) → PostgreSQL (future) |
 | **Auth** | JWT (python-jose) + bcrypt |
-| **AI** | Deterministic rule-based engine (OpenAI/DeepSeek ready) |
-| **Testing** | pytest — 202 tests across engine, service, API, client layers |
+| **AI** | Pluggable AI provider layer: RuleBased (default), OpenAI, DeepSeek |
+| **Testing** | pytest — tests across engine, service, API, client layers |
 | **CI** | GitHub Actions |
 | **Deployment** | Docker Compose + nginx |
 
@@ -97,9 +123,9 @@ These screenshots are committed in `docs/screenshots/` and reflect the current S
 | Screen | Preview |
 |--------|---------|
 | Login | ![Login screen](docs/screenshots/01-login.png) |
-| Health Check | ![Health check screen](docs/screenshots/02-health-check.png) |
+| Health Assessment | ![Health assessment screen](docs/screenshots/02-health-check.png) |
 | Emotion Analysis | ![Emotion analysis screen](docs/screenshots/03-emotion-analysis.png) |
-| Final Report | ![Final report screen](docs/screenshots/04-final-report.png) |
+| Insights Report | ![Insights report screen](docs/screenshots/04-final-report.png) |
 | Trend Analysis | ![Trend analysis screen](docs/screenshots/05-trend-analysis.png) |
 | Dashboard | ![Dashboard screen](docs/screenshots/06-dashboard.png) |
 | AI Coach | ![AI coach screen](docs/screenshots/07-ai-coach.png) |
@@ -154,7 +180,7 @@ Open in browser:
 
 | Role | Username | Password |
 |------|----------|----------|
-| **Admin** | `admin` | `admin123` |
+| **Administrator** | `admin` | `admin123` |
 | **Demo User** | `demo_user` | `demo123456` |
 
 ---
@@ -192,6 +218,15 @@ All endpoints are prefixed with `/api/v1/`.
 | POST | `/ai-reports/generate` | Generate member AI report |
 | CRUD | `/healing-plans` | Healing plan management |
 | CRUD | `/community-cases` | Community case studies |
+| POST | `/growth-journeys/generate` | Generate member growth journey |
+| GET | `/growth-journeys` | List growth journeys (filterable by member_id) |
+| GET | `/growth-journeys/{id}` | Get growth journey detail |
+	| GET | `/patterns/{member_id}` | Discover behaviour patterns |
+	| GET | `/insights/{member_id}` | Generate wellness insights |
+	| GET | `/coach/daily/{member_id}` | Get daily coaching message |
+	| POST | `/reflections` | Create daily reflection |
+	| GET | `/reflections` | List reflections (filterable by member_id) |
+	| GET | `/reflections/weekly-summary/{member_id}` | Get weekly reflection summary |
 
 ---
 
@@ -221,7 +256,7 @@ AI_Wellness_Platform/
 │
 ├── modules/                     # Shared modules
 │   ├── ui.py                    # Product theme, nav, render components
-│   ├── admin_ui.py              # Admin dashboard components
+│   ├── admin_ui.py              # Administration dashboard components
 │   ├── coach_engine.py
 │   ├── coach_memory.py
 │   ├── dashboard_insights.py
@@ -270,10 +305,13 @@ python scripts/seed_demo_data.py
 |-------|-------|-------|
 | Engines | 23 | Individual assessment module logic |
 | Services | 11 | Orchestration and scoring |
-| API | 75+ | All 25+ endpoint integration tests |
+| AI Providers | 15 | Provider fallback, factory, RuleBased/OpenAI/DeepSeek |
+| API | 75+ | All 30+ endpoint integration tests |
 | Auth | 20+ | JWT, registration, login, token refresh |
 | User Isolation | 7 | Cross-user data access prevention |
 | Wellness OS | 17 | Members, consultations, AI reports, cases |
+| Growth Journey | 10 | Generate, list, detail, user isolation |
+| Product Intelligence | 21 | Pattern Discovery, Insights, Coach, Reflections |
 
 ---
 
@@ -284,7 +322,9 @@ python scripts/seed_demo_data.py
 | **v0.1** | ✅ Complete | FastAPI backend, health + emotion APIs, JWT auth |
 | **v0.2** | ✅ Complete | AI reports, trend analysis, Docker, docs |
 | **v0.3** | ✅ Complete | **Wellness OS** — Members, consultations, AI reports, healing plans, community cases, admin dashboard, demo data generator |
-| **v0.4** | ⏳ Planned | PostgreSQL migration, Next.js frontend, recommendation engine |
+| **v0.4** | ✅ Complete | **AI Provider abstraction** (RuleBased/OpenAI/DeepSeek), **Growth Journey timeline** |
+| **v0.5** | ✅ Complete | **Product Intelligence** — Pattern Discovery Engine, Insights Dashboard, AI Coach, Daily Reflection, Wellness Timeline upgrade |
+| **v0.6** | ⏳ Planned | PostgreSQL migration, Next.js frontend, recommendation engine, real AI provider integration |
 
 ---
 

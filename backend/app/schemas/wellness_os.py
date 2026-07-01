@@ -172,3 +172,101 @@ class DashboardSummaryResponse(BaseModel):
     total_community_cases: int
     recent_members: list[MemberResponse]
     recent_consultations: list[ConsultationResponse]
+
+
+# ── Growth Journey ──────────────────────────────────────────────────
+
+class GrowthJourneyGenerateRequest(BaseModel):
+    member_id: int
+
+
+class GrowthJourneyResponse(BaseModel):
+    id: int
+    member_id: int
+    title: str
+    summary: Optional[str] = None
+    timeline_items: Optional[Any] = None
+    insights: Optional[Any] = None
+    created_at: datetime
+    updated_at: Optional[str] = None
+    model_config = {"from_attributes": True}
+
+
+class GrowthJourneyListResponse(BaseModel):
+    items: list[GrowthJourneyResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+# ── Pattern Discovery ───────────────────────────────────────────────
+
+class PatternItem(BaseModel):
+    title: str
+    confidence: float
+    evidence: str
+    recommendation: str
+
+
+class PatternDiscoveryResponse(BaseModel):
+    member_id: int
+    patterns: list[PatternItem]
+
+
+# ── Insights Dashboard ──────────────────────────────────────────────
+
+class InsightsResponse(BaseModel):
+    member_id: int
+    wellness_score: Optional[float] = None
+    monthly_trend: Optional[str] = None
+    positive_changes: list[str]
+    risk_alerts: list[str]
+    recommended_focus: Optional[str] = None
+    recent_achievements: list[str]
+
+
+# ── AI Coach ────────────────────────────────────────────────────────
+
+class CoachingMessageResponse(BaseModel):
+    member_id: int
+    date: str
+    message_type: str
+    title: str
+    content: str
+
+
+# ── Daily Reflection ────────────────────────────────────────────────
+
+class ReflectionCreate(BaseModel):
+    member_id: int
+    went_well: Optional[str] = None
+    biggest_challenge: Optional[str] = None
+    gratitude: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class ReflectionResponse(BaseModel):
+    id: int
+    member_id: int
+    went_well: Optional[str] = None
+    biggest_challenge: Optional[str] = None
+    gratitude: Optional[str] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    model_config = {"from_attributes": True}
+
+
+class ReflectionListResponse(BaseModel):
+    items: list[ReflectionResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class WeeklySummaryResponse(BaseModel):
+    member_id: int
+    week_start: str
+    reflection_count: int
+    recurring_themes: list[str]
+    overall_theme: str
+    suggestion: str
